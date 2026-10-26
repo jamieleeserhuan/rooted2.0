@@ -322,12 +322,13 @@ def resolve_model_reference(cache_roots: list[Path], repo_id: str) -> tuple[str,
 @lru_cache(maxsize=1)
 def load_translation_tokenizer():
     """Load the NLLB tokenizer used for translation in and out of English."""
-    ref, is_local = resolve_model_reference(
-        [TRANSLATION_CACHE_ROOT, TRANSLATION_LEGACY_CACHE_ROOT],
-        TRANSLATION_MODEL_REPO,
-    )
+    # Load by repo id, not by local snapshot folder. The snapshot folder can
+    # exist with only some files in it (for example, the tokenizer downloads
+    # first and creates it), and loading it with local_files_only=True then
+    # fails because the weights are missing. By repo id, Hugging Face uses
+    # whatever is cached and downloads only what is missing.
     try:
-        return AutoTokenizer.from_pretrained(ref, local_files_only=is_local)
+        return AutoTokenizer.from_pretrained(TRANSLATION_MODEL_REPO)
     except Exception as exc:
         # RuntimeError (not SystemExit) so callers can catch it and fall back,
         # and the original error is kept in the message so it shows in logs.
@@ -340,12 +341,13 @@ def load_translation_tokenizer():
 @lru_cache(maxsize=1)
 def load_translation_model() -> AutoModelForSeq2SeqLM:
     """Load the NLLB seq2seq model used only for translation."""
-    ref, is_local = resolve_model_reference(
-        [TRANSLATION_CACHE_ROOT, TRANSLATION_LEGACY_CACHE_ROOT],
-        TRANSLATION_MODEL_REPO,
-    )
+    # Load by repo id, not by local snapshot folder. The snapshot folder can
+    # exist with only some files in it (for example, the tokenizer downloads
+    # first and creates it), and loading it with local_files_only=True then
+    # fails because the weights are missing. By repo id, Hugging Face uses
+    # whatever is cached and downloads only what is missing.
     try:
-        model = AutoModelForSeq2SeqLM.from_pretrained(ref, local_files_only=is_local)
+        model = AutoModelForSeq2SeqLM.from_pretrained(TRANSLATION_MODEL_REPO)
     except Exception as exc:
         raise RuntimeError(
             f"Could not load the {TRANSLATION_MODEL_REPO} model: "
