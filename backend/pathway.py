@@ -73,6 +73,9 @@ def _llm_settings() -> tuple[str, str, str]:
     are picked up after load_dotenv() has run in main.py.
     """
     api_key = os.environ.get("LLM_API_KEY") or os.environ.get("GROQ_API_KEY")
+    # Pasted secrets often carry stray whitespace or quotes, which the provider
+    # rejects as an invalid key.
+    api_key = (api_key or "").strip().strip("'\"").strip()
     if not api_key:
         raise ValueError(
             "LLM_API_KEY environment variable is not set. "
