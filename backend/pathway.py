@@ -346,6 +346,21 @@ def _extract_json(raw: str) -> dict:
     raise ValueError(f"No valid JSON found in LLM output: {raw[:200]}")
 
 
+def _describe_error(e: Exception) -> str:
+    """
+    A log-safe description of why generation failed. Prompts only contain the
+    occupation, province and document situation (never the user's own words),
+    so the provider's error message is safe to log.
+    """
+    if isinstance(e, httpx.HTTPStatusError):
+        detail = e.response.text[:300] if e.response is not None else ""
+        status = e.response.status_code if e.response is not None else "?"
+        return f"HTTP {status} from the LLM provider: {detail}"
+    if isinstance(e, httpx.HTTPError):
+        return f"Could not reach the LLM provider: {type(e).__name__}"
+    return f"{type(e).__name__}: {str(e)[:300]}"
+
+
 # =============================================================================
 # FALLBACK CARD
 #
@@ -501,7 +516,7 @@ def generate_pathway_card(
         # Something went wrong (API error, rate limit, bad JSON, validation).
         # Return the fallback card but do NOT cache it, so the next request
         # retries the LLM instead of serving the fallback until restart.
-        logger.error(f"Pathway generation failed for NOC {noc_code} ({title}): {type(e).__name__}")
+        logger.error(f"Pathway generation failed for NOC {noc_code} ({title}): {_describe_error(e)}")
         return _fallback_card(noc_code, title, province_name)
 
     # Only successful cards are cached
