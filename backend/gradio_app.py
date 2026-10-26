@@ -82,8 +82,16 @@ ON_ZERO_GPU = os.getenv("SPACES_ZERO_GPU", "").lower() in ("1", "t", "true")
 DEVICE = "cuda" if ON_ZERO_GPU or torch.cuda.is_available() else "cpu"
 
 embedding_model = matcher.load_embedding_model().to(DEVICE)
-load_translation_tokenizer()
-load_translation_model().to(DEVICE)
+
+# Translation is only used to translate PDFs, so if it fails to load, keep the
+# app running and hand out English PDFs instead of crashing the whole Space.
+try:
+    load_translation_tokenizer()
+    load_translation_model().to(DEVICE)
+    TRANSLATION_READY = True
+except Exception as e:
+    TRANSLATION_READY = False
+    logger.error("Translation unavailable, PDFs will be in English. %s", e)
 
 
 # =============================================================================
@@ -203,6 +211,8 @@ def export_pdf(
         jobs=jobs or [],
         pathway_text=(pathway_text or "")[:8000],
     )
+    if not TRANSLATION_READY:
+        args["detected_language"] = "eng_Latn"
     try:
         if args["detected_language"].lower() in ENGLISH_CODES:
             pdf_bytes = generate_pdf(**args)  # nothing to translate, no GPU needed

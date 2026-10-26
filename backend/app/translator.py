@@ -328,11 +328,12 @@ def load_translation_tokenizer():
     )
     try:
         return AutoTokenizer.from_pretrained(ref, local_files_only=is_local)
-    except OSError as exc:
-        raise SystemExit(
-            "The translation model facebook/nllb-200-distilled-600M is not "
-            "available locally yet. Run once with network access to download it, "
-            "or ask Codex to fetch it for you."
+    except Exception as exc:
+        # RuntimeError (not SystemExit) so callers can catch it and fall back,
+        # and the original error is kept in the message so it shows in logs.
+        raise RuntimeError(
+            f"Could not load the {TRANSLATION_MODEL_REPO} tokenizer: "
+            f"{type(exc).__name__}: {exc}"
         ) from exc
 
 
@@ -345,11 +346,10 @@ def load_translation_model() -> AutoModelForSeq2SeqLM:
     )
     try:
         model = AutoModelForSeq2SeqLM.from_pretrained(ref, local_files_only=is_local)
-    except OSError as exc:
-        raise SystemExit(
-            "The translation model facebook/nllb-200-distilled-600M is not "
-            "available locally yet. Run once with network access to download it, "
-            "or ask Codex to fetch it for you."
+    except Exception as exc:
+        raise RuntimeError(
+            f"Could not load the {TRANSLATION_MODEL_REPO} model: "
+            f"{type(exc).__name__}: {exc}"
         ) from exc
     model.eval()
     return model
