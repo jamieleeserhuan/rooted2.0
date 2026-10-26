@@ -5,7 +5,7 @@ This file is responsible for ONE thing: taking a matched NOC occupation
 (code, title, description) and generating a plain-language pathway card
 that tells a refugee what steps to take to work in that field in Canada.
 
-It uses Llama 3.1 8B (served by Groq through an OpenAI-compatible API by
+It uses gpt-oss-20b (served by Groq through an OpenAI-compatible API by
 default) to generate the card content, then validates the output with Pydantic
 before returning it, so the rest of the app always gets a clean, predictable object.
 
@@ -32,7 +32,7 @@ DEPENDENCIES:
 ENVIRONMENT VARIABLES:
   LLM_API_KEY   (required) API key for the LLM provider. GROQ_API_KEY also works.
   LLM_BASE_URL  (optional) OpenAI-compatible base URL. Default: Groq.
-  LLM_MODEL     (optional) Model name. Default: llama-3.1-8b-instant.
+  LLM_MODEL     (optional) Model name. Default: openai/gpt-oss-20b.
 
   Any OpenAI-compatible provider works by changing these three values, so
   switching providers never requires a code change.
@@ -57,13 +57,15 @@ logger = logging.getLogger("pathway")
 # =============================================================================
 # CLIENT SETUP
 # Talks to any OpenAI-compatible chat completions API. Defaults to Groq's
-# free tier, which serves Llama 3.1 8B and does not retain inference data by
-# default (turn on Zero Data Retention in Groq's Data Controls settings too).
+# free tier (turn on Zero Data Retention in Groq's Data Controls settings).
+# Groq retired Llama 3.1 8B on 16 August 2026; gpt-oss-20b is its
+# recommended replacement. Check console.groq.com/docs/deprecations before
+# changing the model.
 # The key is read from environment variables. Never hardcode it here.
 # =============================================================================
 
 DEFAULT_BASE_URL = "https://api.groq.com/openai/v1"
-DEFAULT_MODEL = "llama-3.1-8b-instant"
+DEFAULT_MODEL = "openai/gpt-oss-20b"
 REQUEST_TIMEOUT_SECONDS = 60
 
 
@@ -89,24 +91,41 @@ def _llm_settings() -> tuple[str, str, str]:
 def _chat_completion(messages: list[dict], max_tokens: int, temperature: float) -> str:
     """
     Send one chat completion request and return the reply text.
-    Asks for JSON mode so the model returns a bare JSON object.
     Raises on HTTP errors (including rate limits) so the caller can fall back.
     """
     api_key, base_url, model = _llm_settings()
-    response = httpx.post(
-        f"{base_url}/chat/completions",
-        headers={"Authorization": f"Bearer {api_key}"},
-        json={
-            "model": model,
-            "messages": messages,
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-            "response_format": {"type": "json_object"},
-        },
-        timeout=REQUEST_TIMEOUT_SECONDS,
-    )
+    body = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+    }
+    # Optional extras: JSON mode, and for reasoning models (gpt-oss) a short
+    # reasoning phase. Reasoning tokens count against max_tokens, so give them
+    # room. If a provider or model rejects the extras (HTTP 400), retry once
+    # with the plain request; _extract_json copes with non-JSON-mode output.
+    extras = {"response_format": {"type": "json_object"}}
+    if "gpt-oss" in model:
+        extras["reasoning_effort"] = "low"
+        body["max_tokens"] = max_tokens + 1500
+
+    def post(payload: dict) -> httpx.Response:
+        return httpx.post(
+            f"{base_url}/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}"},
+            json=payload,
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
+
+    response = post({**body, **extras})
+    if response.status_code == 400:
+        logger.warning("LLM rejected optional parameters, retrying without them: %s", response.text[:300])
+        response = post(body)
     response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"]
+    content = response.json()["choices"][0]["message"].get("content") or ""
+    if not content.strip():
+        raise ValueError("LLM returned an empty reply (output limit may be too low)")
+    return content
 
 
 # =============================================================================

@@ -14,7 +14,7 @@ Built for the AI4Good Lab (Mila/McGill, 2026).
 
 1. **Describe your experience**: type your work history in any language
 2. **Get matched**: BGE-M3 matches your description to the 516 Canadian NOC unit groups
-3. **See your pathway**: Llama 3.1 8B (via Groq) generates a step-by-step credential recognition card with estimated time, costs, and funding options
+3. **See your pathway**: gpt-oss-20b (via Groq) generates a step-by-step credential recognition card with estimated time, costs, and funding options
 
 ---
 
@@ -26,7 +26,7 @@ Built for the AI4Good Lab (Mila/McGill, 2026).
 | Backend | Python + Gradio API (`backend/gradio_app.py`) | Hugging Face ZeroGPU Space (free) |
 | Matching | BGE-M3 (`BAAI/bge-m3`), multilingual, so descriptions are matched in their original language | Space CPU (GPU only to build the index at boot) |
 | PDF translation | NLLB-200 (`facebook/nllb-200-distilled-600M`) | Space CPU |
-| Pathway generation | Llama 3.1 8B via Groq (any OpenAI-compatible API works) | Groq free tier |
+| Pathway generation | gpt-oss-20b via Groq (any OpenAI-compatible API works) | Groq free tier |
 | NOC data | ESDC level5.csv (516 unit groups) | Bundled |
 
 The browser calls the Space directly with `@gradio/client`. Requests never use the GPU: on ZeroGPU each GPU call counts against the visitor's daily quota, and visitors without a Hugging Face account get only a couple of minutes a day. Both models run on the Space's CPU instead, and the GPU is used once at boot to build the occupation index.
@@ -138,7 +138,7 @@ rooted/
 |----------|----------|-------------|
 | `LLM_API_KEY` | Yes | API key for the LLM provider (Groq by default) |
 | `LLM_BASE_URL` | No | OpenAI-compatible base URL. Default: `https://api.groq.com/openai/v1` |
-| `LLM_MODEL` | No | Model name. Default: `llama-3.1-8b-instant` |
+| `LLM_MODEL` | No | Model name. Default: `openai/gpt-oss-20b` |
 
 ### Frontend (`frontend/.env.local` locally, Vercel environment variables in production)
 | Variable | Default | Description |
