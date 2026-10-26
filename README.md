@@ -20,14 +20,18 @@ Built for the AI4Good Lab (Mila/McGill, 2026).
 
 ## Tech stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React + TypeScript + Vite |
-| Backend | Python + FastAPI |
-| Matching | BGE-M3 (`BAAI/bge-m3`) |
-| Translation | NLLB-200 (`facebook/nllb-200-distilled-600M`) |
-| Pathway generation | Llama 3.1 8B via Groq (any OpenAI-compatible API works) |
-| NOC data | ESDC level5.csv (516 unit groups) |
+| Layer | Technology | Hosted on |
+|-------|-----------|-----------|
+| Frontend | React + TypeScript + Vite | Vercel (free) |
+| Backend | Python + Gradio API (`backend/gradio_app.py`) | Hugging Face ZeroGPU Space (free) |
+| Matching | BGE-M3 (`BAAI/bge-m3`), multilingual, so descriptions are matched in their original language | Space GPU |
+| PDF translation | NLLB-200 (`facebook/nllb-200-distilled-600M`) | Space GPU |
+| Pathway generation | Llama 3.1 8B via Groq (any OpenAI-compatible API works) | Groq free tier |
+| NOC data | ESDC level5.csv (516 unit groups) | Bundled |
+
+The browser calls the Space directly with `@gradio/client`. That matters: ZeroGPU gives each visitor their own small daily GPU allowance, and a proxy server in between would make every visitor share one.
+
+**What goes where.** A person's own description is only ever processed by the Space. The LLM receives the matched occupation, the province and the document situation, never the person's words.
 
 ---
 
@@ -35,74 +39,65 @@ Built for the AI4Good Lab (Mila/McGill, 2026).
 
 - Python 3.10+
 - Node.js 18+
-- A free [Groq API key](https://console.groq.com/keys)
+- A free [Groq API key](https://console.groq.com/keys). In Groq's Data Controls settings, turn on Zero Data Retention.
 
 ---
 
-## Getting started
+## Running locally
 
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/jamieleeserhuan/rooted.git
-cd rooted
-```
-
-### 2. Set up the backend
+### 1. Backend
 
 ```bash
 cd backend
-pip install -r requirements.txt
+pip install -r requirements.txt gradio==6.30.0
 ```
 
-Create a `.env` file in the `backend/` folder:
+Create `backend/.env`:
 ```
 LLM_API_KEY=your_groq_api_key_here
 ```
 
-Start the backend server:
+Start it:
 ```bash
-uvicorn main:app --reload --port 8000
+python gradio_app.py
 ```
 
-The backend runs at `http://localhost:8000`. You can verify it's working at `http://localhost:8000/health`.
+The first start downloads BGE-M3 and NLLB and builds the NOC index, which takes a few minutes on CPU. It then runs at `http://localhost:7860`, where *Use via API* lists the endpoints. (`main.py` is the older FastAPI version of the same backend and still works with `uvicorn main:app --port 8000`, but the frontend now talks to the Gradio app.)
 
-### 3. Set up the frontend
-
-Open a new terminal:
+### 2. Frontend
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create a `.env.local` file in the `frontend/` folder:
+Create `frontend/.env.local`:
 ```
 VITE_USE_MOCK=false
-VITE_API_URL=http://localhost:8000
+VITE_SPACE=http://localhost:7860
 ```
 
-Start the frontend server:
-```bash
-npm run dev
-```
+Then `npm run dev` and open `http://localhost:3000`.
 
-### 4. Open the app
-
-Go to `http://localhost:3000` in your browser.
+To work on the frontend without the backend, set `VITE_USE_MOCK=true` and it will use realistic mock matches and pathway cards.
 
 ---
 
-## Running with mock data (no backend needed)
+## Deploying
 
-If you want to run the frontend without the Python backend:
+### Backend: Hugging Face ZeroGPU Space
 
-In `frontend/.env.local`, set:
-```
-VITE_USE_MOCK=true
-```
+1. Create a Space at [huggingface.co/new-space](https://huggingface.co/new-space): SDK **Gradio**, hardware **ZeroGPU**, visibility **Public**. Free accounts can host up to 2 ZeroGPU Spaces once the account is 30 days old with a verified email.
+2. In the Space's **Settings > Variables and secrets**, add the secret `LLM_API_KEY` (your Groq key).
+3. Upload the backend folder, either:
+   - **Automatically:** in this GitHub repo, add the Actions variable `HF_SPACE` (e.g. `jamieleeserhuan/rooted-api`) and the secret `HF_TOKEN` (a Hugging Face token with write access). Every push to `main` that touches `backend/` then deploys it (`.github/workflows/deploy-space.yml`).
+   - **Manually:** `hf upload jamieleeserhuan/rooted-api backend . --repo-type space --exclude "data/cache/**"`
 
-Then run `npm run dev` in the frontend folder. The app will use realistic mock NOC matches and pathway cards.
+`backend/README.md` holds the Space's configuration (SDK version, Python version, entry file).
+
+### Frontend: Vercel
+
+Set the project's root directory to `frontend` and add the environment variable `VITE_SPACE` with your Space id (e.g. `jamieleeserhuan/rooted-api`), then redeploy.
 
 ---
 
@@ -110,55 +105,46 @@ Then run `npm run dev` in the frontend folder. The app will use realistic mock N
 
 ```
 rooted/
-├── backend/
+├── backend/                  # Deployed as the Hugging Face Space
+│   ├── gradio_app.py         # Space entry point: /match, /pathway, /export_pdf
+│   ├── main.py               # Older FastAPI version of the same API
+│   ├── pathway.py            # LLM pathway card generation (Groq)
 │   ├── app/
-│   │   ├── matcher.py       # BGE-M3 NOC matching
-│   ├── pathway.py           # Llama 3.1 8B pathway card generation
-│   ├── main.py              # FastAPI entry point
-│   ├── data/
-│   │   └── level5.csv       # NOC dataset (516 unit groups)
+│   │   ├── matcher.py        # BGE-M3 NOC matching
+│   │   ├── translator.py     # Language detection + NLLB translation
+│   │   ├── pdf_exporter.py   # PDF report
+│   │   └── funding_retriever.py
+│   ├── data/level5.csv       # NOC dataset (516 unit groups)
+│   ├── README.md             # Space configuration
 │   └── requirements.txt
-└── frontend/
-    ├── src/
-    │   ├── api/
-    │   │   ├── match.ts      # NOC matching API calls
-    │   │   └── pathway.ts    # Pathway generation API calls
-    │   ├── components/
-    │   │   ├── Home.tsx
-    │   │   ├── InputScreen.tsx
-    │   │   ├── MatchResults.tsx
-    │   │   └── PathwayScreen.tsx
-    │   ├── App.tsx
-    │   └── types.ts
-    └── server.ts             # Express proxy server
+├── frontend/
+│   └── src/
+│       ├── api/
+│       │   ├── space.ts      # Connection to the Space
+│       │   ├── match.ts
+│       │   └── pathway.ts
+│       ├── components/
+│       ├── App.tsx
+│       └── types.ts
+└── .github/workflows/deploy-space.yml
 ```
-
----
-
-## API endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/match` | Translate + match description to NOC codes |
-| `POST` | `/pathway` | Generate LLM pathway card for a NOC code |
-| `GET` | `/health` | Check backend is running |
 
 ---
 
 ## Environment variables
 
-### Backend (`backend/.env`)
+### Backend (`backend/.env` locally, Space secrets in production)
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `LLM_API_KEY` | Yes | API key for the LLM provider (Groq by default) |
 | `LLM_BASE_URL` | No | OpenAI-compatible base URL. Default: `https://api.groq.com/openai/v1` |
 | `LLM_MODEL` | No | Model name. Default: `llama-3.1-8b-instant` |
 
-### Frontend (`frontend/.env.local`)
+### Frontend (`frontend/.env.local` locally, Vercel environment variables in production)
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `VITE_USE_MOCK` | `false` | Set to `true` to run without backend |
-| `VITE_API_URL` | `http://localhost:8000` | Frontend server URL |
+| `VITE_SPACE` | none | Space id (`owner/name`) or local URL of the backend |
+| `VITE_USE_MOCK` | `false` | Set to `true` to run without the backend |
 
 ---
 

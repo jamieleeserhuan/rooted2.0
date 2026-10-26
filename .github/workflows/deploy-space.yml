@@ -1,0 +1,42 @@
+# Deploys the backend/ folder to the Rooted Hugging Face Space on every push
+# to main that changes it. Setup (once), in GitHub > Settings > Secrets and
+# variables > Actions:
+#   - Variable HF_SPACE: the Space id, e.g. jamieleeserhuan/rooted-api
+#   - Secret   HF_TOKEN: a Hugging Face access token with write access
+# Until HF_SPACE is set, this workflow is skipped.
+
+name: Deploy backend to Hugging Face Space
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-space.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: vars.HF_SPACE != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the Hugging Face CLI
+        run: pip install -U huggingface_hub
+
+      - name: Upload backend folder to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: >
+          hf upload "${{ vars.HF_SPACE }}" backend .
+          --repo-type space
+          --exclude "data/cache/**"
+          --exclude "**/__pycache__/**"
+          --exclude ".env"
+          --exclude ".gitkeep"
+          --commit-message "Deploy from GitHub ${{ github.sha }}"

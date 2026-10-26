@@ -1,10 +1,10 @@
 /**
  * src/pathway.ts
  * ------------------
- * All fetch logic for the /pathway endpoint (pathway.py).
+ * All logic for the /pathway endpoint (pathway.py, served by the Rooted Space).
  *
  * This is the ONLY place in the frontend that talks to the pathway backend.
- * Components never call fetch() directly — they call fetchPathway() instead.
+ * Components never call the backend directly; they call fetchPathway() instead.
  *
  * TO USE MOCK DATA (while backend is in development):
  *   Set VITE_USE_MOCK=true in your .env.local
@@ -13,39 +13,36 @@
  *   Set VITE_USE_MOCK=false (or remove it)
  */
 
-import type { PathwayCard, NocMatch } from '../types';
+import type { PathwayCard, NocMatch, UserInput } from '../types';
+import { callSpace } from './space';
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
-const API_URL = import.meta.env.VITE_API_URL || '';
 
 // ---------------------------------------------------------------------------
 // Main function — this is what components call
 // ---------------------------------------------------------------------------
 
-export async function fetchPathway(match: NocMatch, province: string = "ON"): Promise<PathwayCard> {
+export async function fetchPathway(
+  match: NocMatch,
+  province: string = 'ON',
+  documentsAvailable: UserInput['documentsAvailable'] = 'some'
+): Promise<PathwayCard> {
   if (USE_MOCK) {
     // Simulate network delay so loading states are visible during development
     await delay(1200);
     return getMockPathwayCard(match.nocCode, match.title);
   }
 
-  const res = await fetch(`${API_URL}/pathway`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      noc_code: match.nocCode,
-      title: match.title,
-      // Use full definition if available, fall back to short description
-        definition: match.definition || match.description,
-        province: province,
-    }),
+  return callSpace<PathwayCard>('/pathway', {
+    noc_code: match.nocCode,
+    title: match.title,
+    // Use full definition if available, fall back to short description
+    definition: match.definition || match.description,
+    province,
+    // Without this, every card was generated as if the person had "some"
+    // documents, so people with none never got the no-documents guidance.
+    documents_available: documentsAvailable,
   });
-
-  if (!res.ok) {
-    throw new Error(`Pathway API error: ${res.status}`);
-  }
-
-  return res.json();
 }
 
 // ---------------------------------------------------------------------------

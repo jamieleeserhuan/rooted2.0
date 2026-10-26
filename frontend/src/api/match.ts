@@ -1,14 +1,14 @@
 /**
  * src/api/match.ts
  * ----------------
- * All fetch logic for the NOC matching endpoint.
- * Wired to the FastAPI backend (main.py /match endpoint).
+ * All logic for the NOC matching endpoint.
+ * Calls the /match endpoint on the Rooted Space (backend/gradio_app.py).
  */
 
 import type { NocMatch, MatchApiResponse, Language } from '../types';
+import { callSpace } from './space';
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
-const API_URL = import.meta.env.VITE_API_URL || '';
 
 // Shape of a single item in the backend's /match response (matcher.py's Job type)
 interface BackendJob {
@@ -35,21 +35,10 @@ export async function fetchNocMatches(
     return getMockMatches(description);
   }
 
-  const res = await fetch(`${API_URL}/match`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      description,
-      source_lang: 'auto', // let the backend detect the language
-    }),
+  const data = await callSpace<BackendMatchResponse>('/match', {
+    description,
+    source_lang: 'auto', // let the backend detect the language
   });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || `Match API error: ${res.status}`);
-  }
-
-  const data: BackendMatchResponse = await res.json();
 
   return {
     matches: data.matches.map(mapJobToNocMatch),

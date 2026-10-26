@@ -347,27 +347,62 @@ def build_noc_url(noc_code: str) -> str:
     return JOB_BANK_SEARCH_URL.format(noc_code=noc_code)
 
 
-def get_match(text: str) -> list[Job]:
-    """Return the top 5 matching jobs for a user query."""
-    query = normalize_query_text(text)
-    if not query:
-        return []
+# ---------------------------------------------------------------------------
+# NOC index
+#
+# The 516 NOC occupation embeddings are computed once and kept in memory, so
+# each request only embeds the user's query. Before this, every request
+# re-read the CSV and re-checked the embedding cache from disk.
+# ---------------------------------------------------------------------------
 
+_INDEX: tuple[np.ndarray, list[dict[str, object]]] | None = None
+
+
+def _index_inputs() -> tuple[pd.DataFrame, Path, Path]:
     input_path = resolve_input_path()
     cache_dir = resolve_cache_dir()
     df = load_dataset(input_path)
-    model = load_embedding_model()
     embeddings_path, metadata_path = resolve_cache_paths(input_path, cache_dir)
-    embeddings, metadata = load_or_build_embeddings(
-        model,
-        df,
-        embeddings_path,
-        metadata_path,
-    )
+    return df, embeddings_path, metadata_path
 
-    query_embedding = embed_text(model, query)
+
+def build_index(model: SentenceTransformer) -> tuple[np.ndarray, list[dict[str, object]]]:
+    """Load the NOC embeddings from the disk cache, computing them if needed."""
+    df, embeddings_path, metadata_path = _index_inputs()
+    return load_or_build_embeddings(model, df, embeddings_path, metadata_path)
+
+
+def load_cached_index() -> tuple[np.ndarray, list[dict[str, object]]] | None:
+    """Return the NOC index from the disk cache without loading a model, or None."""
+    _, embeddings_path, metadata_path = _index_inputs()
+    if not (embeddings_path.exists() and metadata_path.exists()):
+        return None
+    embeddings = np.load(embeddings_path)
+    metadata = json.loads(metadata_path.read_text())
+    if embeddings.shape[0] != len(metadata):
+        return None
+    return embeddings, metadata
+
+
+def set_index(embeddings: np.ndarray, metadata: list[dict[str, object]]) -> None:
+    """Install a prebuilt index (used by the Space, which builds it on the GPU)."""
+    global _INDEX
+    _INDEX = (embeddings, metadata)
+
+
+def get_index() -> tuple[np.ndarray, list[dict[str, object]]]:
+    """Return the in-memory index, building it with the local model if needed."""
+    global _INDEX
+    if _INDEX is None:
+        _INDEX = build_index(load_embedding_model())
+    return _INDEX
+
+
+def rank_matches(query_embedding: np.ndarray, top_k: int = TOP_MATCHES) -> list[Job]:
+    """Turn a query embedding into the top NOC matches."""
+    embeddings, metadata = get_index()
     similarities = embeddings @ query_embedding
-    top_indices = np.argsort(similarities)[::-1][:TOP_MATCHES]
+    top_indices = np.argsort(similarities)[::-1][:top_k]
 
     jobs: list[Job] = []
     for rank, index in enumerate(top_indices, start=1):
@@ -395,6 +430,16 @@ def get_match(text: str) -> list[Job]:
             }
         )
     return jobs
+
+
+def get_match(text: str) -> list[Job]:
+    """Return the top 5 matching jobs for a user query."""
+    query = normalize_query_text(text)
+    if not query:
+        return []
+    get_index()
+    query_embedding = embed_text(load_embedding_model(), query)
+    return rank_matches(query_embedding)
 
 
 def normalize_query_text(text: str) -> str:

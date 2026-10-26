@@ -447,7 +447,7 @@ def translate_text(text: str, source_lang: str, target_lang: str) -> str:
     if target_lang_id == tokenizer.unk_token_id:
         raise SystemExit(f"Unsupported NLLB target language code '{target_lang}'.")
     tokenizer.src_lang = source_lang
-    inputs = tokenizer(normalized, return_tensors="pt", truncation=True)
+    inputs = tokenizer(normalized, return_tensors="pt", truncation=True).to(model.device)
 
     with torch.inference_mode():
         output_tokens = model.generate(

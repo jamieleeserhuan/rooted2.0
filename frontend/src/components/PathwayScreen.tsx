@@ -13,6 +13,7 @@ import { Language, NocMatch, PathwayCard, UserInput } from '../types';
 import { translations } from '../data/translations';
 import { getPathwayWithFallback } from '../data/curatedPathways';
 import { fetchPathway } from '../api/pathway';
+import { callSpace } from '../api/space';
 
 interface PathwayScreenProps {
   currentLanguage: Language;
@@ -224,24 +225,18 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
     setIsExporting(true);
     setExportError('');
     try {
-      const API_URL = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${API_URL}/export-pdf`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_text: userInput.description,
-          detected_language: pdfLanguage,
-          province: pathway.province,
-          jobs: [mapNocMatchToJobModel(match)],
-          pathway_text: buildPathwayText(pathway, match.title, match.nocCode),
-        }),
+      // The Space returns the PDF as base64 text so it is never written to
+      // the server's file cache.
+      const pdfBase64 = await callSpace<string>('/export_pdf', {
+        user_text: userInput.description,
+        detected_language: pdfLanguage,
+        province: pathway.province,
+        jobs: [mapNocMatchToJobModel(match)],
+        pathway_text: buildPathwayText(pathway, match.title, match.nocCode),
       });
 
-      if (!res.ok) {
-        throw new Error(`Export failed: ${res.status}`);
-      }
-
-      const blob = await res.blob();
+      const bytes = Uint8Array.from(atob(pdfBase64), (c) => c.charCodeAt(0));
+      const blob = new Blob([bytes], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
