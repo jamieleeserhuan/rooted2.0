@@ -14,7 +14,7 @@ Built for the AI4Good Lab (Mila/McGill, 2026).
 
 1. **Describe your experience**: type your work history in any language
 2. **Get matched**: BGE-M3 matches your description to the 516 Canadian NOC unit groups
-3. **See your pathway**: Llama 3.1 8B generates a step-by-step credential recognition card with estimated time, costs, and funding options
+3. **See your pathway**: Llama 3.1 8B (via Groq) generates a step-by-step credential recognition card with estimated time, costs, and funding options
 
 ---
 
@@ -26,7 +26,7 @@ Built for the AI4Good Lab (Mila/McGill, 2026).
 | Backend | Python + FastAPI |
 | Matching | BGE-M3 (`BAAI/bge-m3`) |
 | Translation | NLLB-200 (`facebook/nllb-200-distilled-600M`) |
-| Pathway generation | Llama 3.1 8B via HuggingFace Inference API (Novita) |
+| Pathway generation | Llama 3.1 8B via Groq (any OpenAI-compatible API works) |
 | NOC data | ESDC level5.csv (516 unit groups) |
 
 ---
@@ -35,7 +35,7 @@ Built for the AI4Good Lab (Mila/McGill, 2026).
 
 - Python 3.10+
 - Node.js 18+
-- A [HuggingFace account](https://huggingface.co) with an API token
+- A free [Groq API key](https://console.groq.com/keys)
 
 ---
 
@@ -57,7 +57,7 @@ pip install -r requirements.txt
 
 Create a `.env` file in the `backend/` folder:
 ```
-HF_TOKEN=your_huggingface_token_here
+LLM_API_KEY=your_groq_api_key_here
 ```
 
 Start the backend server:
@@ -150,7 +150,9 @@ rooted/
 ### Backend (`backend/.env`)
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `HF_TOKEN` | Yes | HuggingFace API token for Llama 3.1 8B via Novita |
+| `LLM_API_KEY` | Yes | API key for the LLM provider (Groq by default) |
+| `LLM_BASE_URL` | No | OpenAI-compatible base URL. Default: `https://api.groq.com/openai/v1` |
+| `LLM_MODEL` | No | Model name. Default: `llama-3.1-8b-instant` |
 
 ### Frontend (`frontend/.env.local`)
 | Variable | Default | Description |

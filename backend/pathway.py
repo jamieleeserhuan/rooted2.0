@@ -5,9 +5,9 @@ This file is responsible for ONE thing: taking a matched NOC occupation
 (code, title, description) and generating a plain-language pathway card
 that tells a refugee what steps to take to work in that field in Canada.
 
-It uses Llama 3.1 8B (via HuggingFace Inference API, routed through Novita)
-to generate the card content, then validates the output with Pydantic before
-returning it — so the rest of the app always gets a clean, predictable object.
+It uses Llama 3.1 8B (served by Groq through an OpenAI-compatible API by
+default) to generate the card content, then validates the output with Pydantic
+before returning it, so the rest of the app always gets a clean, predictable object.
 
 HOW IT FITS INTO ROOTED:
   1. User describes their work experience (frontend)
@@ -27,10 +27,15 @@ TO USE THIS FILE:
   print(card.steps[0].heading)
 
 DEPENDENCIES:
-  pip install huggingface_hub pydantic
+  pip install httpx pydantic
 
-ENVIRONMENT VARIABLES NEEDED:
-  HF_TOKEN — your HuggingFace API token (set in .env or Colab Secrets)
+ENVIRONMENT VARIABLES:
+  LLM_API_KEY   (required) API key for the LLM provider. GROQ_API_KEY also works.
+  LLM_BASE_URL  (optional) OpenAI-compatible base URL. Default: Groq.
+  LLM_MODEL     (optional) Model name. Default: llama-3.1-8b-instant.
+
+  Any OpenAI-compatible provider works by changing these three values, so
+  switching providers never requires a code change.
 """
 
 import json
@@ -40,7 +45,7 @@ import re
 from typing import Optional
 from pydantic import model_validator
 
-from huggingface_hub import InferenceClient
+import httpx
 from pydantic import BaseModel, Field, field_validator
 from app.funding_retriever import get_funding_programs
 
@@ -51,30 +56,54 @@ logger = logging.getLogger("pathway")
 
 # =============================================================================
 # CLIENT SETUP
-# Connects to HuggingFace's Inference API using the Novita provider.
-# Novita gives us faster access to Llama 3.1 8B than the default HF endpoint.
-# The token is read from environment variables — never hardcode it here.
+# Talks to any OpenAI-compatible chat completions API. Defaults to Groq's
+# free tier, which serves Llama 3.1 8B and does not retain inference data by
+# default (turn on Zero Data Retention in Groq's Data Controls settings too).
+# The key is read from environment variables. Never hardcode it here.
 # =============================================================================
 
-def _get_client() -> InferenceClient:
-    """
-    Create the HuggingFace client on demand rather than at import time.
-    This ensures HF_TOKEN is read after load_dotenv() has run in main.py.
-    """
-    token = os.environ.get("HF_TOKEN")
-    if not token:
-        raise ValueError(
-            "HF_TOKEN environment variable is not set. "
-            "Add it to backend/.env and make sure load_dotenv() is called in main.py."
-        )
-    return InferenceClient(
-        provider="novita",
-        api_key=token,
-    )
+DEFAULT_BASE_URL = "https://api.groq.com/openai/v1"
+DEFAULT_MODEL = "llama-3.1-8b-instant"
+REQUEST_TIMEOUT_SECONDS = 60
 
-# The specific LLM model we're using to generate pathway cards.
-# Llama 3.1 8B is a good balance of quality and speed for this task.
-MODEL = "meta-llama/llama-3.1-8b-instruct"
+
+def _llm_settings() -> tuple[str, str, str]:
+    """
+    Read provider settings on demand rather than at import time, so values
+    are picked up after load_dotenv() has run in main.py.
+    """
+    api_key = os.environ.get("LLM_API_KEY") or os.environ.get("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError(
+            "LLM_API_KEY environment variable is not set. "
+            "Add it to backend/.env (or your host's secrets)."
+        )
+    base_url = os.environ.get("LLM_BASE_URL", DEFAULT_BASE_URL).rstrip("/")
+    model = os.environ.get("LLM_MODEL", DEFAULT_MODEL)
+    return api_key, base_url, model
+
+
+def _chat_completion(messages: list[dict], max_tokens: int, temperature: float) -> str:
+    """
+    Send one chat completion request and return the reply text.
+    Asks for JSON mode so the model returns a bare JSON object.
+    Raises on HTTP errors (including rate limits) so the caller can fall back.
+    """
+    api_key, base_url, model = _llm_settings()
+    response = httpx.post(
+        f"{base_url}/chat/completions",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "model": model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "response_format": {"type": "json_object"},
+        },
+        timeout=REQUEST_TIMEOUT_SECONDS,
+    )
+    response.raise_for_status()
+    return response.json()["choices"][0]["message"]["content"]
 
 
 # =============================================================================
@@ -220,7 +249,7 @@ https://www.canada.ca/en/immigration-refugees-citizenship/services/refugees/econ
         https://www.canada.ca/en/immigration-refugees-citizenship/services/refugees/sponsor-refugee/private-sponsorship-program/agreement-holders/training-program.html\
             https://accesemployment.ca/; https://www.ontario.ca/page/adult-learning-ontario-bridge-training-program \
                 https://www.jvstoronto.org/resources-for-refugees/ \
-                    https://agirmontreal.org/en/home/ \ 
+                    https://agirmontreal.org/en/home/
                     https://ociso.org/ 
 </sources>
 
@@ -408,7 +437,7 @@ def generate_pathway_card(
     noc_code = str(noc_code)
 
     # Return cached card if we've already generated one for this NOC code
-    cache_key = f"{noc_code}_{province}"
+    cache_key = f"{noc_code}_{province}_{documents_available}"
     if not force_refresh and cache_key in _pathway_cache:
         logger.debug(f"Cache hit for NOC {noc_code}")
         return _pathway_cache[cache_key]
@@ -441,8 +470,7 @@ def generate_pathway_card(
 
     try:
         # Call the LLM
-        response =  _get_client().chat_completion(
-            model=MODEL,
+        raw = _chat_completion(
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},
@@ -450,9 +478,6 @@ def generate_pathway_card(
             max_tokens=700,
             temperature=0.2,  # low temperature = more consistent, less creative output
         )
-
-        # Extract the raw text from the response
-        raw = response.choices[0].message.content
 
         # Parse the JSON out of the raw text (handles fences, extra text, etc.)
         data = _extract_json(raw)
@@ -473,11 +498,13 @@ def generate_pathway_card(
         card = PathwayCard.model_validate(data)
 
     except Exception as e:
-        # Something went wrong — log it and return the fallback card instead
-        logger.error(f"Pathway generation failed for NOC {noc_code} ({title}): {e}")
-        card = _fallback_card(noc_code, title, province_name)
+        # Something went wrong (API error, rate limit, bad JSON, validation).
+        # Return the fallback card but do NOT cache it, so the next request
+        # retries the LLM instead of serving the fallback until restart.
+        logger.error(f"Pathway generation failed for NOC {noc_code} ({title}): {type(e).__name__}")
+        return _fallback_card(noc_code, title, province_name)
 
-    # Store in cache before returning
+    # Only successful cards are cached
     _pathway_cache[cache_key] = card
     return card
 
