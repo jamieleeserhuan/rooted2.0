@@ -10,17 +10,17 @@ Gradio API endpoints that the React frontend calls with @gradio/client:
   /pathway     LLM pathway card for one NOC occupation (runs on CPU, calls Groq)
   /export_pdf  PDF pathway report, translated back into the user's language
 
-HOW ZEROGPU WORKS HERE:
-  A GPU is attached only while a function decorated with @spaces.GPU runs,
-  and each visitor has a small daily GPU quota. So only the model calls are
-  decorated: embedding the user's query, and translating the PDF. Everything
-  else (ranking, the LLM call, building the PDF) runs on CPU and costs the
-  visitor nothing. The browser must call this Space directly (not through a
-  proxy server) so each visitor uses their own quota.
+HOW ZEROGPU IS USED HERE:
+  On ZeroGPU, every @spaces.GPU call counts against the *visitor's* daily GPU
+  quota, and visitors without a Hugging Face account get only a couple of
+  minutes a day. Rooted's users are refugees who will not have accounts, so
+  no request ever uses the GPU: both models stay on CPU, where embedding one
+  description takes about a second. The GPU is used once, at boot, to build
+  the 516-occupation index, which runs on the Space's own allowance.
 
 PRIVACY:
-  Nothing the user types is written to disk or logged. Errors are logged by
-  exception type only. The PDF is returned as base64 text, so it never lands
+  Nothing the user types is written to disk or logged. Errors are logged without
+  any user text. The PDF is returned as base64 text, so it never lands
   in Gradio's file cache.
 
 RUN LOCALLY:
@@ -72,22 +72,18 @@ ENGLISH_CODES = {"", "auto", "english", "eng_latn"}
 
 
 # =============================================================================
-# MODELS
-# ZeroGPU wants models placed on "cuda" at import time; outside a GPU call
-# that placement is emulated, and inside one it is real. Off ZeroGPU (local
-# runs) we stay on CPU unless a real GPU is present.
+# MODELS (kept on CPU so requests never use a visitor's GPU quota)
 # =============================================================================
 
-ON_ZERO_GPU = os.getenv("SPACES_ZERO_GPU", "").lower() in ("1", "t", "true")
-DEVICE = "cuda" if ON_ZERO_GPU or torch.cuda.is_available() else "cpu"
+torch.set_num_threads(max(1, os.cpu_count() or 1))
 
-embedding_model = matcher.load_embedding_model().to(DEVICE)
+embedding_model = matcher.load_embedding_model().to("cpu")
 
 # Translation is only used to translate PDFs, so if it fails to load, keep the
 # app running and hand out English PDFs instead of crashing the whole Space.
 try:
     load_translation_tokenizer()
-    load_translation_model().to(DEVICE)
+    load_translation_model().to("cpu")
     TRANSLATION_READY = True
 except Exception as e:
     TRANSLATION_READY = False
@@ -96,41 +92,32 @@ except Exception as e:
 
 # =============================================================================
 # NOC INDEX
-# The 516 occupation embeddings are built once when the Space boots, on the
-# Space's own GPU allowance (not a visitor's), then kept in memory.
+# The 516 occupation embeddings are built once when the Space boots and kept
+# in memory. This is the only GPU use: it runs at startup on the Space's own
+# allowance, not a visitor's (ZeroGPU also requires at least one GPU function).
+# The model is moved to the GPU for the build and back to CPU afterwards.
 # =============================================================================
 
 @spaces.GPU(duration=180)
 def _build_index_on_gpu():
-    return matcher.build_index(embedding_model)
+    embedding_model.to("cuda")
+    try:
+        return matcher.build_index(embedding_model)
+    finally:
+        embedding_model.to("cpu")
 
 
 _index = matcher.load_cached_index()
 if _index is None:
     logger.info("Building NOC index (first boot)...")
-    _index = _build_index_on_gpu()
+    try:
+        _index = _build_index_on_gpu()
+    except Exception as e:
+        logger.error("GPU index build failed, building on CPU (slower): %s", e)
+        embedding_model.to("cpu")
+        _index = matcher.build_index(embedding_model)
 matcher.set_index(*_index)
 logger.info("NOC index ready: %d occupations", len(_index[1]))
-
-
-# =============================================================================
-# GPU FUNCTIONS (these use the visitor's daily quota, so keep them short)
-# =============================================================================
-
-@spaces.GPU(duration=20)
-def _embed_query(text: str):
-    return matcher.embed_text(embedding_model, text)
-
-
-@spaces.GPU(duration=60)
-def _generate_pdf_on_gpu(user_text, detected_language, province, jobs, pathway_text):
-    return generate_pdf(
-        user_text=user_text,
-        detected_language=detected_language,
-        province=province,
-        jobs=jobs,
-        pathway_text=pathway_text,
-    )
 
 
 # =============================================================================
@@ -163,9 +150,7 @@ def match(description: str, source_lang: str = "auto") -> dict:
 
     detected_language = _detect_language(source_lang, text)
     try:
-        query_embedding = _embed_query(text)
-    except gr.Error:
-        raise  # e.g. the visitor's GPU quota is used up; show ZeroGPU's message
+        query_embedding = matcher.embed_text(embedding_model, text)
     except Exception as e:
         logger.error("match failed: %s", type(e).__name__)
         raise gr.Error("Matching is temporarily unavailable. Please try again in a moment.")
@@ -214,12 +199,9 @@ def export_pdf(
     if not TRANSLATION_READY:
         args["detected_language"] = "eng_Latn"
     try:
-        if args["detected_language"].lower() in ENGLISH_CODES:
-            pdf_bytes = generate_pdf(**args)  # nothing to translate, no GPU needed
-        else:
-            pdf_bytes = _generate_pdf_on_gpu(**args)
+        pdf_bytes = generate_pdf(**args)
     except Exception as e:
-        # GPU busy or quota used up: still give the person an English PDF.
+        # If translation fails for any reason, still give the person a PDF.
         logger.error("translated PDF failed, falling back to English: %s", type(e).__name__)
         args["detected_language"] = "eng_Latn"
         pdf_bytes = generate_pdf(**args)

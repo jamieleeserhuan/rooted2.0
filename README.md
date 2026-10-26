@@ -24,12 +24,12 @@ Built for the AI4Good Lab (Mila/McGill, 2026).
 |-------|-----------|-----------|
 | Frontend | React + TypeScript + Vite | Vercel (free) |
 | Backend | Python + Gradio API (`backend/gradio_app.py`) | Hugging Face ZeroGPU Space (free) |
-| Matching | BGE-M3 (`BAAI/bge-m3`), multilingual, so descriptions are matched in their original language | Space GPU |
-| PDF translation | NLLB-200 (`facebook/nllb-200-distilled-600M`) | Space GPU |
+| Matching | BGE-M3 (`BAAI/bge-m3`), multilingual, so descriptions are matched in their original language | Space CPU (GPU only to build the index at boot) |
+| PDF translation | NLLB-200 (`facebook/nllb-200-distilled-600M`) | Space CPU |
 | Pathway generation | Llama 3.1 8B via Groq (any OpenAI-compatible API works) | Groq free tier |
 | NOC data | ESDC level5.csv (516 unit groups) | Bundled |
 
-The browser calls the Space directly with `@gradio/client`. That matters: ZeroGPU gives each visitor their own small daily GPU allowance, and a proxy server in between would make every visitor share one.
+The browser calls the Space directly with `@gradio/client`. Requests never use the GPU: on ZeroGPU each GPU call counts against the visitor's daily quota, and visitors without a Hugging Face account get only a couple of minutes a day. Both models run on the Space's CPU instead, and the GPU is used once at boot to build the occupation index.
 
 **What goes where.** A person's own description is only ever processed by the Space. The LLM receives the matched occupation, the province and the document situation, never the person's words.
 
