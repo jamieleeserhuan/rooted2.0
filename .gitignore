@@ -1,0 +1,12 @@
+.env
+venv/
+.venv/
+backend/.venv/
+backend/data/cache/
+__pycache__/
+*.pkl
+*.pyc
+.DS_Store
+node_modules/
+.env.local
+testing/embedding_cache/

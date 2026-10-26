@@ -1,0 +1,205 @@
+"""
+main.py
+-------
+This is the entry point for the Rooted backend server.
+
+It creates a FastAPI web server and defines the API endpoints that the
+frontend calls. It imports the three core modules and wires them together:
+
+  - app/translator.py  (teammate) — detects and translates input to English
+  - app/matcher.py     (teammate) — matches English text to NOC codes via S-BERT
+  - pathway.py         (Jamie)    — generates LLM pathway cards via Llama 3.1 8B
+
+HOW TO RUN:
+  cd rooted/backend
+  uvicorn main:app --reload --port 8000
+
+ENDPOINTS:
+POST /export-pdf   — generate and download a PDF pathway report
+  POST /match    — translate input + return top NOC matches
+  POST /pathway  — generate a pathway card for a given NOC code
+  GET  /health   — check that the server is running
+"""
+from fastapi.responses import Response
+from typing import List, Optional
+from app.pdf_exporter import generate_pdf
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+# Import teammate's modules from the app/ subfolder
+from app.matcher import get_match
+from app.translator import translate_text, resolve_source_language
+
+# Import Jamie's pathway module from the backend root
+from pathway import generate_pathway_card, card_to_dict
+
+# import token 
+from dotenv import load_dotenv
+load_dotenv()
+
+
+# ---------------------------------------------------------------------------
+# App initialisation
+# ---------------------------------------------------------------------------
+
+# Create the FastAPI application instance.
+# The title shows up in the auto-generated API docs at /docs
+app = FastAPI(title="Rooted API", version="0.1.0")
+
+
+# ---------------------------------------------------------------------------
+# CORS middleware
+#
+# CORS (Cross-Origin Resource Sharing) allows the frontend (running on
+# localhost:3000 or localhost:5173) to make requests to this backend
+# (running on localhost:8000). Without this, the browser blocks the requests.
+# In production, replace these with your actual deployed frontend URL.
+# ---------------------------------------------------------------------------
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",   # Node/Express frontend (server.ts)
+        "http://localhost:5173",   # Vite dev server
+        "https://rooted-bay.vercel.app", # Deployed frontend URL (replace with your actual URL)
+        "https://rooted-in-canada.vercel.app",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],           # Allow GET, POST, etc.
+    allow_headers=["*"],
+)
+
+
+# ---------------------------------------------------------------------------
+# /match endpoint
+# Owned by: teammate (matcher.py + translator.py)
+# Called by: frontend when user submits their work experience description
+#
+# Flow:
+#   1. Receive user's raw text (may be in any language)
+#   2. Detect the source language (or use the one provided)
+#   3. Translate the text to English so S-BERT can match it properly
+#   4. Run S-BERT matching against the 516 NOC unit groups
+#   5. Return the top 5 matches
+# ---------------------------------------------------------------------------
+
+class MatchRequest(BaseModel):
+    description: str            # User's free-text work experience description
+    source_lang: str = "auto"   # Language code e.g. "fr", "ar", or "auto" to detect
+
+
+@app.post("/match")
+def match_noc(req: MatchRequest):
+    """
+    Match the user's description directly to NOC codes using BGE-M3 multilingual embeddings.
+    Returns a list of the top matching occupations with titles and descriptions.
+    """
+    try:
+        # Step 1: resolve the source language
+        # If source_lang is "auto", this detects it from the text itself
+        detected_lang = resolve_source_language(req.source_lang, req.description)
+
+
+        # Step 3: run S-BERT matching against the NOC corpus
+        # Returns Job dicts with rank, noc_code, job_title, and descriptions
+        matches = get_match(req.description)
+
+        return {
+            "matches": matches,
+            "detected_language": detected_lang,
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------------------------------------------------------------------
+# /pathway endpoint
+# Owned by: Jamie (pathway.py)
+# Called by: frontend when user clicks on a NOC match to see their pathway
+#
+# Flow:
+#   1. Receive a NOC code, title, and definition from the frontend
+#   2. Call generate_pathway_card() which sends a prompt to Llama 3.1 8B
+#   3. Validate the LLM output with Pydantic (happens inside pathway.py)
+#   4. Return the pathway card as a JSON dict
+# ---------------------------------------------------------------------------
+
+class PathwayRequest(BaseModel):
+    noc_code: str         # NOC code string e.g. "31301"
+    title: str            # Occupation title e.g. "Registered nurses"
+    definition: str = ""  # Full NOC definition — used to prompt the LLM
+    province: str = "ON"  # Province code e.g. "ON", "BC"
+    documents_available: str = "some"  # "none", "some", or "full"
+
+class JobModel(BaseModel):
+    rank: int
+    noc_code: str
+    job_title: str
+    job_description: str
+    full_job_description: str = ""
+    match_label: str
+    noc_url: str
+
+
+class ExportPDFRequest(BaseModel):
+    user_text: str
+    detected_language: str = "auto"
+    province: str = ""
+    jobs: List[JobModel]
+    pathway_text: str = "" 
+
+@app.post("/pathway")
+def get_pathway(req: PathwayRequest):
+    """
+    Generate an LLM-powered pathway card for a given NOC occupation.
+    Returns estimated time, cost, step-by-step guidance, and funding info.
+    Falls back to a generic card if the LLM call fails.
+    """
+    # generate_pathway_card handles all error cases internally and never raises
+    # — it returns a fallback card if anything goes wrong
+    card = generate_pathway_card(
+        noc_code=req.noc_code,
+        title=req.title,
+        definition=req.definition,
+        province=req.province,
+        documents_available=req.documents_available,
+    )
+
+    # card_to_dict converts the Pydantic PathwayCard object to a plain dict
+    # so FastAPI can serialise it to JSON
+    return card_to_dict(card)
+
+@app.post("/export-pdf")
+def export_pdf(req: ExportPDFRequest):
+    """Generate and return a PDF pathway report for the user."""
+    try:
+        pdf_bytes = generate_pdf(
+            user_text=req.user_text,
+            detected_language=req.detected_language,
+            province=req.province,
+            jobs=[job.model_dump() for job in req.jobs],
+            pathway_text=req.pathway_text,
+        )
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": "attachment; filename=rooted-pathway.pdf",
+                "Content-Length": str(len(pdf_bytes)),
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+# ---------------------------------------------------------------------------
+# /health endpoint
+# Simple check to confirm the server is running.
+# Useful for deployment monitoring and debugging.
+# ---------------------------------------------------------------------------
+
+@app.get("/health")
+def health():
+    """Returns ok if the server is running."""
+    return {"status": "ok", "version": "0.1.0"}
+

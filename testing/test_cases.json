@@ -1,0 +1,17 @@
+[
+    {
+      "id": "doctor_buried",
+      "text": "In Kampala I worked as a nurse for six years, mostly in maternity and children's wards. I started in a public hospital, then joined a small clinic serving women who feared judgment elsewhere. I drew blood, dressed wounds, counselled patients, and trained two younger nurses. The work felt meaningful. Canada is cold in ways I did not expect. Not just the air, but the silence of my own apartment, the first I have ever had alone. Back home, being seen meant danger. Here, I am invisible in a different way. I am learning which kind hurts less.",
+      "expected_keywords": ["nurse", "registered nurse", "nursing"]
+    },
+    {
+      "id": "implicit_caregiving",
+      "text": "I like kids. I feed my village. I grow vegetables and share them with neighbors who don't have enough.",
+      "expected_keywords": ["childcare", "cook", "farm", "agriculture"]
+    },
+    {
+      "id": "negation_test",
+      "text": "I am not a laborer. I worked for ten years as an accountant in Lagos, managing budgets for a mid-sized trading company.",
+      "expected_keywords": ["accountant", "bookkeeper", "financial"]
+    }
+  ]

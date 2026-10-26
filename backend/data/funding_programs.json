@@ -1,0 +1,128 @@
+[
+  {
+    "program_name": "Better Jobs Ontario",
+    "province": "ON",
+    "funding_amount": "Up to $28,000 for training that is 1 year or less; up to $35,000 for programs more than 1 year and up to 2 years. Amount depends on individual needs and available funding.",
+    "eligibility": [
+      "Applicant has been laid off and is not working.",
+      "Applicant has been laid off and is working a temporary job only to cover costs.",
+      "Applicant has not been laid off, but has been unemployed for 12 weeks or longer and is part of a low-income household.",
+      "Applicants receiving EI, Ontario Works, or ODSP may still apply.",
+      "Application is completed with support from an Employment Ontario service provider."
+    ],
+    "target_careers": [
+      "in-demand jobs",
+      "skills training",
+      "short-term training",
+      "micro-credential programs",
+      "career retraining"
+    ],
+    "target_nocs": [],
+    "application_url": "https://www.ontario.ca/page/better-jobs-ontario",
+    "source_url": "https://www.ontario.ca/page/better-jobs-ontario",
+    "notes": "The official page does not target exact NOC codes. Use this record for broad retraining and in-demand career funding retrieval, not exact occupation mapping. Do not confuse this applicant-focused program with the employer-focused Canada-Ontario Job Grant/Ontario Job Grant.",
+    "last_verified": "2026-06-16"
+  },
+  {
+    "program_name": "Ontario Learn and Stay Grant",
+    "province": "ON",
+    "funding_amount": "Covers tuition, compulsory fees, books, and other direct educational costs for eligible health human resources programs.",
+    "eligibility": [
+      "Applicant must successfully apply to and enrol in an eligible program.",
+      "Applicant must be an Ontario resident.",
+      "Applicant must be a Canadian citizen, permanent resident, or protected person.",
+      "Applicant must commit to working in the same region where they studied after graduating.",
+      "Applicant must not be receiving funding from listed overlapping government programs such as Better Jobs Ontario."
+    ],
+    "target_careers": [
+      "practical nursing",
+      "paramedic",
+      "medical laboratory technology",
+      "medical laboratory science",
+      "nursing",
+      "nurse practitioner",
+      "health human resources"
+    ],
+    "target_nocs": [],
+    "application_url": "https://osap.gov.on.ca/OSAPSecurityWeb/public/agreement.xhtml?src=OLSG",
+    "source_url": "https://www.ontario.ca/page/ontario-learn-and-stay-grant",
+    "notes": "The official page lists eligible programs and regions, but not exact NOC codes. NOC mappings are intentionally left empty to avoid overclaiming.",
+    "last_verified": "2026-06-16"
+  },
+  {
+    "program_name": "Canada-Alberta Productivity Grant",
+    "province": "AB",
+    "funding_amount": "For existing employees, government may cover 50% of eligible training costs up to $5,000 per employed trainee per fiscal year. For hiring and training an unemployed Albertan, government may cover up to 75% of eligible training costs up to $10,000 per trainee per fiscal year. Employer maximum is $100,000 per fiscal year.",
+    "eligibility": [
+      "Employer must have current or potential employees who need training for current or future positions.",
+      "Eligible employers include private sector employers, non-profit sector employers, First Nations, and Metis Settlements.",
+      "Trainees must be current or prospective employees.",
+      "Trainees must be Canadian citizens, permanent residents, or protected persons entitled to work in Canada.",
+      "Ineligible trainees include company owners, family members, temporary foreign workers, and temporary workers in Canada."
+    ],
+    "target_careers": [
+      "business process and operations management",
+      "technical training",
+      "digital training",
+      "technological training",
+      "productivity skills",
+      "workforce competitiveness"
+    ],
+    "target_nocs": [],
+    "application_url": "https://capg.alberta.ca/SignIn?ReturnUrl=%2F.",
+    "source_url": "https://www.alberta.ca/canada-alberta-productivity-grant",
+    "notes": "Employer-driven grant. Training must focus on productivity skills, be relevant to the trainee's job, be completed within 52 weeks, and be delivered in Alberta.",
+    "last_verified": "2026-06-16"
+  },
+  {
+    "program_name": "StrongerBC Future Skills Grant",
+    "province": "BC",
+    "funding_amount": "Up to $3,500 for eligible short-term skills training at public post-secondary institutions in British Columbia.",
+    "eligibility": [
+      "Applicant must be living in British Columbia.",
+      "Applicant must be aged 19 or older.",
+      "Training must be an eligible short-term skills program at a public post-secondary institution.",
+      "A BC Services Card Account may be required for online application access."
+    ],
+    "target_careers": [
+      "health care",
+      "clean energy",
+      "construction",
+      "mining",
+      "marine transportation",
+      "inclusive economy",
+      "short-term skills training"
+    ],
+    "target_nocs": [],
+    "application_url": "https://www.educationplannerbc.ca/future-skills-grant",
+    "source_url": "https://www.workbc.ca/find-loans-and-grants/students-and-adult-learners/strongerbc-future-skills-grant",
+    "notes": "The official WorkBC page says the 2025/2026 program is currently closed for applications and points users to EducationPlannerBC for updates. Keep this caveat visible in user-facing output.",
+    "last_verified": "2026-06-16"
+  },
+  {
+    "program_name": "Workplace Innovation and Productivity Skills Incentive",
+    "province": "NS",
+    "funding_amount": "May fund up to 75% of eligible training costs. Applicant funds the remaining balance.",
+    "eligibility": [
+      "Applicant must be a legally registered business, industry association, sector council, or non-profit operating in Nova Scotia.",
+      "Applicant must have a direct workforce development need such as upskilling employees, adopting new technologies, or addressing critical skills gaps.",
+      "Applicant must demonstrate financial and administrative capacity to deliver the proposed initiative.",
+      "Applicant must operate within or support sectors aligned with Nova Scotia economic and workforce development priorities."
+    ],
+    "target_careers": [
+      "digital transformation",
+      "technology adoption",
+      "process improvement",
+      "green workforce skills",
+      "industry certification",
+      "regulatory compliance",
+      "high-demand occupations",
+      "workforce readiness"
+    ],
+    "target_nocs": [],
+    "application_url": "https://lampss.novascotia.ca/",
+    "source_url": "https://novascotia.ca/programs/workplace-innovation-productivity-skills-incentive/",
+    "notes": "Program prioritizes workforce development, innovation, productivity, critical skill shortages, and underrepresented groups. Current official page lists an intake period from April 1 to April 30, 2026.",
+    "last_verified": "2026-06-16"
+  }
+]
