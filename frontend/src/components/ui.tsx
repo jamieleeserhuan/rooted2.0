@@ -7,6 +7,10 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 
+/** Fills {name} placeholders in a translated phrase. */
+export const fill = (s: string, vars: Record<string, string>) =>
+  s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
+
 /** Gold: the single main action on a screen (same as the website's "Try Rooted"). */
 export const btnGold =
   'inline-flex items-center justify-center gap-2 min-h-[52px] px-7 rounded-[10px] bg-gold text-forest font-semibold text-base ' +
@@ -14,12 +18,12 @@ export const btnGold =
 
 /** Forest: secondary actions on cream screens. */
 export const btnForest =
-  'inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-[10px] bg-forest text-cream font-semibold text-[15px] ' +
+  'inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-[10px] bg-forest text-cream font-semibold text-[0.9375rem] ' +
   'hover:bg-forest-deep transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
 
 /** Quiet: outlined, for "start over" and similar. */
 export const btnQuiet =
-  'inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-[10px] border border-line text-forest font-semibold text-[15px] ' +
+  'inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-[10px] border border-line text-forest font-semibold text-[0.9375rem] ' +
   'hover:bg-cream transition-colors cursor-pointer';
 
 /** Text link with the website's sage underline. */
@@ -27,13 +31,13 @@ export const linkUnderline =
   'underline underline-offset-[5px] decoration-sage hover:decoration-2 cursor-pointer';
 
 export const fieldBase =
-  'w-full bg-paper border-[1.5px] border-line rounded-xl px-4 text-[16px] text-forest-deep ' +
+  'w-full bg-paper border-[1.5px] border-line rounded-xl px-4 text-[1rem] text-forest-deep ' +
   'focus:border-forest focus:outline-none transition-colors';
 
 /** Small uppercase mono label, like "ESTIMATED TIME" on the website demo. */
 export function Eyebrow({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <span className={`font-mono text-[12px] tracking-[0.14em] rtl:tracking-normal uppercase text-sage-dark ${className}`}>
+    <span className={`font-mono text-[0.75rem] tracking-[0.14em] rtl:tracking-normal uppercase text-sage-dark ${className}`}>
       {children}
     </span>
   );
@@ -63,7 +67,7 @@ export function ScreenHeader({
         <ArrowLeft className="w-5 h-5 rtl:-scale-x-100" />
       </button>
       <div className="min-w-0 flex-1">
-        <h1 dir="auto" className="m-0 text-[clamp(28px,4vw,40px)] leading-[1.08] tracking-[-0.015em] font-semibold text-forest text-balance">
+        <h1 dir="auto" className="m-0 text-[clamp(1.75rem,1rem+2vw,2.5rem)] leading-[1.08] tracking-[-0.015em] font-semibold text-forest text-balance">
           {title}
         </h1>
         {children}
@@ -116,7 +120,7 @@ export function Modal({
         <div className="flex items-start justify-between gap-4 mb-5">
           <div className="flex items-start gap-3">
             {icon}
-            <h2 id="rooted-modal-title" className="m-0 text-[26px] leading-[1.15] font-semibold text-forest">{title}</h2>
+            <h2 id="rooted-modal-title" className="m-0 text-[1.625rem] leading-[1.15] font-semibold text-forest">{title}</h2>
           </div>
           <button
             type="button"

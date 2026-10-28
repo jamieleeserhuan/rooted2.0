@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { AlertCircle, Languages } from 'lucide-react';
 import type { Language, NocMatch, UserInput, Screen } from './types';
 import { fetchNocMatches } from './api/match';
+import { translations } from './data/translations';
 import Home from './components/Home';
 import InputScreen from './components/InputScreen';
 import MatchResults from './components/MatchResults';
@@ -52,7 +53,7 @@ export default function App() {
       setIsSandboxMode(!!data.fallbackMode);
       setScreen('results');
     } catch (error: any) {
-      setMatchError(error.message || 'Could not find matching occupations. Please try again.');
+      setMatchError(error.message || translations[currentLanguage].matchError);
     } finally {
       setIsLoadingMatches(false);
     }
@@ -71,12 +72,13 @@ export default function App() {
   };
 
   const onHome = screen === 'home';
+  const t = translations[currentLanguage];
 
   return (
     <div className={`min-h-svh flex flex-col ${onHome ? 'bg-forest' : 'bg-cream-light'}`} dir={isRtl ? 'rtl' : 'ltr'} lang={currentLanguage === 'dr' ? 'fa-AF' : currentLanguage}>
       {/* Header: same green bar as the website nav */}
       <header className="on-forest bg-forest text-cream border-b border-sage/25">
-        <div className="mx-auto max-w-[1120px] px-5 sm:px-10 min-h-[72px] sm:min-h-[80px] py-2.5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+        <div className="mx-auto max-w-[1120px] px-[20px] sm:px-[40px] min-h-[72px] sm:min-h-[80px] py-[10px] flex flex-wrap items-center justify-between gap-x-[24px] gap-y-[8px]">
           <button
             type="button"
             onClick={() => setScreen('home')}
@@ -85,7 +87,7 @@ export default function App() {
             Rooted
           </button>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center gap-[8px] sm:gap-[12px]">
             {import.meta.env.VITE_USE_MOCK === 'true' && (
               <span className="hidden sm:inline font-mono text-[11px] tracking-[0.14em] uppercase text-gold border border-gold/50 px-2.5 py-1 rounded-md">
                 Mock mode
@@ -93,9 +95,9 @@ export default function App() {
             )}
 
             {/* Language */}
-            <label className="relative flex items-center gap-2 min-h-[44px] px-3 rounded-[10px] border border-cream/40 text-cream hover:border-cream/70 transition-colors cursor-pointer">
+            <label className="relative flex items-center gap-2 min-h-[44px] px-[12px] rounded-[10px] border border-cream/40 text-cream hover:border-cream/70 transition-colors cursor-pointer">
               <Languages aria-hidden="true" className="w-4 h-4 text-sage" />
-              <span className="sr-only">Select Language</span>
+              <span className="sr-only">{t.selectLanguage}</span>
               <select
                 value={currentLanguage}
                 onChange={(e) => setCurrentLanguage(e.target.value as Language)}
@@ -109,16 +111,16 @@ export default function App() {
             </label>
 
             {/* Text size */}
-            <div role="group" aria-label="Text size" className="flex items-center rounded-[10px] border border-cream/40 p-0.5">
+            <div role="group" aria-label={t.textSize} className="flex items-center rounded-[10px] border border-cream/40 p-0.5">
               {(['normal', 'large', 'xlarge'] as const).map((size, i) => (
                 <button
                   key={size}
                   type="button"
                   onClick={() => setFontSize(size)}
                   aria-pressed={fontSize === size}
-                  aria-label={size === 'normal' ? 'Normal text' : size === 'large' ? 'Large text' : 'Extra large text'}
-                  title={size === 'normal' ? 'Normal text' : size === 'large' ? 'Large text' : 'Extra large text'}
-                  className={`w-11 h-11 sm:w-10 sm:h-10 rounded-[8px] font-serif font-semibold transition-colors cursor-pointer ${
+                  aria-label={size === 'normal' ? t.textNormal : size === 'large' ? t.textLarge : t.textXL}
+                  title={size === 'normal' ? t.textNormal : size === 'large' ? t.textLarge : t.textXL}
+                  className={`w-[44px] h-[44px] sm:w-[40px] sm:h-[40px] rounded-[8px] font-serif font-semibold transition-colors cursor-pointer ${
                     i === 0 ? 'text-[14px]' : i === 1 ? 'text-[17px]' : 'text-[20px]'
                   } ${fontSize === size ? 'bg-cream text-forest' : 'text-cream hover:bg-cream/10'}`}
                 >
@@ -138,13 +140,13 @@ export default function App() {
             <div className="flex items-start gap-3 rounded-xl bg-cream px-4 py-4 text-forest-deep">
               <AlertCircle aria-hidden="true" className="w-5 h-5 shrink-0 mt-0.5 text-forest" />
               <div className="flex flex-col gap-2">
-                <p className="m-0 text-[15px] font-medium">{matchError}</p>
+                <p className="m-0 text-[0.9375rem] font-medium">{matchError}</p>
                 <button
                   type="button"
                   onClick={() => setMatchError('')}
-                  className="self-start min-h-[40px] text-[14px] font-medium text-forest underline underline-offset-4 decoration-sage cursor-pointer"
+                  className="self-start min-h-[40px] text-[0.875rem] font-medium text-forest underline underline-offset-4 decoration-sage cursor-pointer"
                 >
-                  Dismiss
+                  {t.dismiss}
                 </button>
               </div>
             </div>

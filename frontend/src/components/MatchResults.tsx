@@ -26,8 +26,8 @@ export default function MatchResults({ currentLanguage, matches, onBack, onSelec
       {isSandboxMode && (
         <div className="mt-8 rounded-xl bg-cream px-4 py-4 flex flex-col gap-1.5 text-start">
           <Eyebrow>Simulated Sandbox Active</Eyebrow>
-          <p className="m-0 text-[14px] leading-[1.55] text-forest-deep">
-            Because no <code className="font-mono text-[13px] px-1 rounded bg-paper border border-line">GEMINI_API_KEY</code> has been set up in Settings, Rooted is running in simulated sandbox mode. Tracing completed with our local semantic matcher and mock pathways. To unlock dynamic translation & custom drafting, configure your API secret.
+          <p className="m-0 text-[0.875rem] leading-[1.55] text-forest-deep">
+            Because no <code className="font-mono text-[0.8125rem] px-1 rounded bg-paper border border-line">GEMINI_API_KEY</code> has been set up in Settings, Rooted is running in simulated sandbox mode. Tracing completed with our local semantic matcher and mock pathways. To unlock dynamic translation & custom drafting, configure your API secret.
           </p>
         </div>
       )}
@@ -42,13 +42,13 @@ export default function MatchResults({ currentLanguage, matches, onBack, onSelec
           >
             <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
               <Eyebrow><bdi>NOC CODE {match.nocCode}</bdi></Eyebrow>
-              <span dir="auto" className="text-[13px] font-medium text-forest">{match.matchLabel}</span>
+              <span dir="auto" className="text-[0.8125rem] font-medium text-forest">{match.matchLabel}</span>
             </div>
 
-            <h2 dir="auto" className="m-0 text-[24px] leading-[1.15] font-semibold text-forest">{match.title}</h2>
-            {match.category && <span className="text-[13px] text-sage-dark">{match.category}</span>}
+            <h2 dir="auto" className="m-0 text-[1.5rem] leading-[1.15] font-semibold text-forest">{match.title}</h2>
+            {match.category && <span className="text-[0.8125rem] text-sage-dark">{match.category}</span>}
 
-            <p dir="auto" className="m-0 text-[15px] leading-[1.55] text-forest-deep">{match.description}</p>
+            <p dir="auto" className="m-0 text-[0.9375rem] leading-[1.55] text-forest-deep">{match.description}</p>
 
             <div className="h-1 w-full rounded-full bg-cream overflow-hidden" aria-hidden="true">
               <div className="h-full rounded-full bg-forest" style={{ width: `${match.confidence}%` }} />
@@ -64,7 +64,7 @@ export default function MatchResults({ currentLanguage, matches, onBack, onSelec
 
       {/* Escape hatch */}
       <div className="mt-10 text-center">
-        <button type="button" onClick={onBack} className={`min-h-[48px] text-[15px] font-medium text-forest ${linkUnderline}`}>
+        <button type="button" onClick={onBack} className={`min-h-[48px] text-[0.9375rem] font-medium text-forest ${linkUnderline}`}>
           {t.escapeHatch}
         </button>
       </div>

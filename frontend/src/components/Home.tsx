@@ -33,10 +33,10 @@ export default function Home({ currentLanguage, onStart }: HomeProps) {
 
       <div className="relative mx-auto max-w-[1120px] px-5 sm:px-10 py-[clamp(56px,11vh,128px)] min-h-[calc(100svh-81px)] flex flex-col justify-center">
         <div className="max-w-[640px] flex flex-col gap-6 rooted-in">
-          <h1 className="m-0 text-[clamp(38px,5.4vw,68px)] leading-[1.04] tracking-[-0.015em] font-semibold text-cream text-balance">
+          <h1 className="m-0 text-[clamp(2.375rem,1rem+4.2vw,4.25rem)] leading-[1.04] tracking-[-0.015em] font-semibold text-cream text-balance">
             {t.tagline}
           </h1>
-          <p className="m-0 max-w-[540px] text-[18px] leading-[1.6] text-cream text-pretty">
+          <p className="m-0 max-w-[540px] text-[1.125rem] leading-[1.6] text-cream text-pretty">
             {t.briefExplanation}
           </p>
 
@@ -48,7 +48,7 @@ export default function Home({ currentLanguage, onStart }: HomeProps) {
               id="how-works-button"
               type="button"
               onClick={() => setShowHowItWorksModal(true)}
-              className={`min-h-[48px] text-[16px] font-medium text-cream ${linkUnderline}`}
+              className={`min-h-[48px] text-[1rem] font-medium text-cream ${linkUnderline}`}
             >
               {t.howItWorksCTA}
             </button>
@@ -58,11 +58,11 @@ export default function Home({ currentLanguage, onStart }: HomeProps) {
           <div className="mt-8 border-t border-sage/35 max-w-[560px]">
             {disclosures.map((d) => (
               <details key={d.title} className="group border-b border-sage/35">
-                <summary className="flex items-center justify-between gap-4 min-h-[56px] cursor-pointer text-[13px] font-medium tracking-[0.14em] rtl:tracking-normal uppercase text-cream">
+                <summary className="flex items-center justify-between gap-4 min-h-[56px] py-3 cursor-pointer text-[0.8125rem] font-medium tracking-[0.14em] rtl:tracking-normal uppercase text-cream">
                   {d.title}
                   <Plus aria-hidden="true" className="w-4 h-4 shrink-0 text-sage transition-transform group-open:rotate-45" />
                 </summary>
-                <p className="m-0 pb-5 text-[15px] leading-[1.6] text-cream/90">{d.text}</p>
+                <p className="m-0 pb-5 text-[0.9375rem] leading-[1.6] text-cream/90">{d.text}</p>
               </details>
             ))}
           </div>
@@ -80,10 +80,9 @@ export default function Home({ currentLanguage, onStart }: HomeProps) {
             </button>
           }
         >
-          <div className="flex flex-col gap-4 text-[16px] leading-[1.6]">
+          <div className="flex flex-col gap-4 text-[1rem] leading-[1.6]">
             <p className="m-0">{t.howItWorksText1}</p>
             <p className="m-0">{t.howItWorksText2}</p>
-            <p className="m-0">{t.howItWorksText3}</p>
           </div>
         </Modal>
       )}

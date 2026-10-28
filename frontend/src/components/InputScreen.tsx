@@ -11,13 +11,8 @@ import { Language, UserInput } from '../types';
 import { translations } from '../data/translations';
 import { ScreenHeader, Eyebrow, btnGold, fieldBase } from './ui';
 
-const NEW_BEGINNINGS_QUOTES = [
-  "Every root has to start somewhere.",
-  "Your experience travels with you.",
-  "New ground, same skills.",
-  "Finding potential paths for you.",
-  "Your story continues in Canada.",
-];
+// The rotating lines on the loading screen (text lives in translations.ts).
+const QUOTE_KEYS = ['quote1', 'quote2', 'quote3', 'quote4', 'quote5'];
 
 interface InputScreenProps {
   currentLanguage: Language;
@@ -32,15 +27,13 @@ export default function InputScreen({ currentLanguage, onBack, onSubmit, isLoadi
   const [description, setDescription] = useState('');
   const [province, setProvince] = useState('ON');
   const [documentsAvailable, setDocumentsAvailable] = useState<'none' | 'some' | 'full'>('none');
-  const [isTransOrGenderDiverse, setIsTransOrGenderDiverse] = useState(false);
-  const [needsChildcare, setNeedsChildcare] = useState(false);
   const [showMentalHealthModal, setShowMentalHealthModal] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState<{ fn: () => void } | null>(null);
   const [quoteIndex, setQuoteIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setQuoteIndex((prev) => (prev + 1) % NEW_BEGINNINGS_QUOTES.length);
+      setQuoteIndex((prev) => (prev + 1) % QUOTE_KEYS.length);
     }, 4000);
     return () => clearInterval(interval);
   }, []);
@@ -70,12 +63,10 @@ export default function InputScreen({ currentLanguage, onBack, onSubmit, isLoadi
 
   const handleSelectExample = (desc: string) => {
     setDescription(desc);
-    if (desc.includes('queer') || desc.includes('Malaysia')) {
-      setIsTransOrGenderDiverse(true);
-    } else {
-      setIsTransOrGenderDiverse(false);
-    }
   };
+
+  // The name-change option was removed; the backend field stays, always false.
+  const isTransOrGenderDiverse = false;
 
   const provinces = [
     { code: 'ON', name: 'Ontario' },
@@ -115,16 +106,16 @@ export default function InputScreen({ currentLanguage, onBack, onSubmit, isLoadi
     return (
       <div className="mx-auto w-full max-w-[720px] px-5 sm:px-8 py-16 sm:py-24">
         <div className="flex flex-col items-center gap-7 text-center rooted-fade" role="status" aria-live="polite">
-          <h2 className="m-0 text-[clamp(30px,4vw,44px)] leading-[1.1] font-semibold text-forest">
-            Finding your path...
+          <h2 className="m-0 text-[clamp(1.875rem,1rem+2.4vw,2.75rem)] leading-[1.1] font-semibold text-forest">
+            {t.loadingTitle}
           </h2>
 
           <div className="relative w-full max-w-[280px] h-1.5 bg-cream rounded-full overflow-hidden" aria-hidden="true">
             <div className="absolute h-full w-1/3 bg-forest rounded-full rooted-loading-bar" />
           </div>
 
-          <p key={quoteIndex} className="m-0 max-w-md min-h-[3rem] font-serif italic text-[20px] leading-[1.4] text-forest rooted-fade">
-            "{NEW_BEGINNINGS_QUOTES[quoteIndex]}"
+          <p key={quoteIndex} className="m-0 max-w-md min-h-[3rem] font-serif italic text-[1.25rem] leading-[1.4] text-forest rooted-fade">
+            "{t[QUOTE_KEYS[quoteIndex]]}"
           </p>
         </div>
       </div>
@@ -139,16 +130,16 @@ export default function InputScreen({ currentLanguage, onBack, onSubmit, isLoadi
       <div className="mt-8 flex gap-3 items-start rounded-xl bg-cream px-4 py-4">
         <ShieldCheck aria-hidden="true" className="w-5 h-5 shrink-0 mt-0.5 text-forest" />
         <div className="flex flex-col gap-1">
-          <Eyebrow><bdi>Your Privacy Matters</bdi></Eyebrow>
-          <p className="m-0 text-[15px] leading-[1.55] text-forest-deep">{t.privacyAboveCTA}</p>
+          <Eyebrow>{t.privacyMattersTitle}</Eyebrow>
+          <p className="m-0 text-[0.9375rem] leading-[1.55] text-forest-deep">{t.privacyAboveCTA}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-8 text-start">
         {/* Description */}
         <div className="flex flex-col gap-3">
-          <label htmlFor="description" dir="auto" className="text-[15px] font-medium leading-[1.5] text-forest-deep">
-            Type in any language. The more detail, the better your matches:
+          <label htmlFor="description" dir="auto" className="text-[0.9375rem] font-medium leading-[1.5] text-forest-deep">
+            {t.descLabel}
           </label>
           <textarea
             id="description"
@@ -163,13 +154,13 @@ export default function InputScreen({ currentLanguage, onBack, onSubmit, isLoadi
 
           {/* Example */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span className="text-[14px] text-sage-dark">{t.examplePillsLabel}</span>
+            <span className="text-[0.875rem] text-sage-dark">{t.examplePillsLabel}</span>
             {examples.map((example, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => handleSelectExample(example.description)}
-                className="min-h-[40px] px-4 rounded-full border border-line bg-paper text-[14px] font-medium text-forest hover:bg-cream transition-colors cursor-pointer"
+                className="min-h-[40px] px-4 rounded-full border border-line bg-paper text-[0.875rem] font-medium text-forest hover:bg-cream transition-colors cursor-pointer"
                 disabled={isLoading}
               >
                 {example.text}
@@ -181,7 +172,7 @@ export default function InputScreen({ currentLanguage, onBack, onSubmit, isLoadi
         {/* Province + Documents */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="flex flex-col gap-2">
-            <label htmlFor="province" className="text-[15px] font-medium leading-[1.4] text-forest-deep">
+            <label htmlFor="province" className="text-[0.9375rem] font-medium leading-[1.4] text-forest-deep">
               {t.selectProvinceLabel}
             </label>
             <select
@@ -200,7 +191,7 @@ export default function InputScreen({ currentLanguage, onBack, onSubmit, isLoadi
           </div>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="documentsAvailable" className="text-[15px] font-medium leading-[1.4] text-forest-deep">
+            <label htmlFor="documentsAvailable" className="text-[0.9375rem] font-medium leading-[1.4] text-forest-deep">
               {t.selectDocsLabel}
             </label>
             <select
@@ -217,34 +208,6 @@ export default function InputScreen({ currentLanguage, onBack, onSubmit, isLoadi
           </div>
         </div>
 
-        {/* Optional needs */}
-        <div className="flex flex-col border-t border-line">
-          <label htmlFor="needsChildcare" className="flex gap-3.5 items-start py-4 border-b border-line cursor-pointer">
-            <input
-              id="needsChildcare"
-              type="checkbox"
-              checked={needsChildcare}
-              onChange={(e) => setNeedsChildcare(e.target.checked)}
-              className="w-5 h-5 mt-0.5 shrink-0 accent-forest cursor-pointer"
-              disabled={isLoading}
-            />
-            <span dir="auto" className="text-[15px] leading-[1.5] text-forest-deep">
-              Do you need childcare support? We will include childcare resources alongside your pathway.
-            </span>
-          </label>
-          <label htmlFor="isTransOrGenderDiverse" className="flex gap-3.5 items-start py-4 border-b border-line cursor-pointer">
-            <input
-              id="isTransOrGenderDiverse"
-              type="checkbox"
-              checked={isTransOrGenderDiverse}
-              onChange={(e) => setIsTransOrGenderDiverse(e.target.checked)}
-              className="w-5 h-5 mt-0.5 shrink-0 accent-forest cursor-pointer"
-              disabled={isLoading}
-            />
-            <span className="text-[15px] leading-[1.5] text-forest-deep">{t.isTransLabel}</span>
-          </label>
-        </div>
-
         {/* Submit */}
         <button
           id="submit-button"
@@ -258,6 +221,7 @@ export default function InputScreen({ currentLanguage, onBack, onSubmit, isLoadi
 
       {showMentalHealthModal && (
         <MentalHealthModal
+          currentLanguage={currentLanguage}
           province={province}
           onContinue={() => {
             setShowMentalHealthModal(false);

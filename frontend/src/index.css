@@ -50,32 +50,9 @@ summary::-webkit-details-marker { display: none; }
   .rooted-loading-bar { animation-duration: 4s; }
 }
 
-/* Accessibility font size scaling (the A A A control in the header).
-   Scales text inside the main content area only. */
-[data-fontsize="large"] main h1 { font-size: 3rem !important; }
-[data-fontsize="large"] main h2 { font-size: 2rem !important; }
-[data-fontsize="large"] main h3 { font-size: 1.5rem !important; }
-[data-fontsize="large"] main p,
-[data-fontsize="large"] main span,
-[data-fontsize="large"] main a,
-[data-fontsize="large"] main li,
-[data-fontsize="large"] main label,
-[data-fontsize="large"] main select,
-[data-fontsize="large"] main input,
-[data-fontsize="large"] main textarea,
-[data-fontsize="large"] main button,
-[data-fontsize="large"] main summary { font-size: 1.2rem !important; }
-
-[data-fontsize="xlarge"] main h1 { font-size: 3.5rem !important; }
-[data-fontsize="xlarge"] main h2 { font-size: 2.4rem !important; }
-[data-fontsize="xlarge"] main h3 { font-size: 1.7rem !important; }
-[data-fontsize="xlarge"] main p,
-[data-fontsize="xlarge"] main span,
-[data-fontsize="xlarge"] main a,
-[data-fontsize="xlarge"] main li,
-[data-fontsize="xlarge"] main label,
-[data-fontsize="xlarge"] main select,
-[data-fontsize="xlarge"] main input,
-[data-fontsize="xlarge"] main textarea,
-[data-fontsize="xlarge"] main button,
-[data-fontsize="xlarge"] main summary { font-size: 1.4rem !important; }
+/* Accessibility text size (the A A A control in the header).
+   All page text is sized in rem, so changing the root size scales every
+   heading, label and paragraph together and keeps their proportions.
+   The header itself uses fixed sizes so it stays compact. */
+html[data-fontsize="large"] { font-size: 118.75%; }   /* 19px body base */
+html[data-fontsize="xlarge"] { font-size: 137.5%; }   /* 22px body base */

@@ -23,21 +23,6 @@ interface PathwayScreenProps {
 }
 
 // ---------------------------------------------------------------------------
-// Placeholder content for sections not yet covered by the LLM-generated
-// pathway card. Clearly marked as sample data — replace with real
-// per-province research when available.
-// ---------------------------------------------------------------------------
-
-const PLACEHOLDER_FUNDING =
-  "Sample data: Newcomer loan programs and provincial bridging bursaries may help cover assessment, exam, and training costs. [Placeholder — replace with verified provincial funding info]";
-
-const PLACEHOLDER_CHILDCARE =
-  "Sample data: Many provinces offer child care subsidies for newcomers completing credential assessments or bridging programs. Check with your local settlement agency. [Placeholder — replace with verified provincial childcare support info]";
-
-const PLACEHOLDER_NAME_DISCREPANCY =
-  "Sample data: Provincial regulatory bodies generally accept a statutory declaration to address name discrepancies for trans and non-binary applicants. [Placeholder — replace with regulator-specific guidance]";
-
-// ---------------------------------------------------------------------------
 // Display types — only the fields PathwayScreen actually renders
 // ---------------------------------------------------------------------------
 
@@ -59,9 +44,16 @@ interface DisplayPathway {
   typicalCost: string;
   fundingOptions: string[];
   steps: DisplayStep[];
-  childcareSupport: string;
-  nameDiscrepancyGuide?: string;
 }
+
+// Step tags are stored in English (they also go into the PDF, which the
+// backend translates). On screen they are shown in the chosen language.
+const STATUS_TRANSLATION_KEYS: Record<string, string> = {
+  'Credential assessment': 'statusAssessment',
+  'Alternative path for missing documents': 'statusNoDocs',
+  'Language requirement': 'statusLanguage',
+  'Fee required': 'statusFee',
+};
 
 const FLAG_STATUS_MAP: Record<string, { status: StepStatus; statusText: string }> = {
   assessment: { status: 'info', statusText: 'Credential assessment' },
@@ -70,11 +62,7 @@ const FLAG_STATUS_MAP: Record<string, { status: StepStatus; statusText: string }
   fee: { status: 'pending', statusText: 'Fee required' },
 };
 
-function mapPathwayCardToDisplay(
-  card: PathwayCard,
-  fallbackProvince: string,
-  isTransOrGenderDiverse: boolean
-): DisplayPathway {
+function mapPathwayCardToDisplay(card: PathwayCard, fallbackProvince: string): DisplayPathway {
   const timeRange =
     card.estimated_time_months_min === card.estimated_time_months_max
       ? `${card.estimated_time_months_min} months`
@@ -89,7 +77,8 @@ function mapPathwayCardToDisplay(
     province: card.province || fallbackProvince,
     typicalTime: timeRange,
     typicalCost: costText,
-    fundingOptions: [card.funding_note || PLACEHOLDER_FUNDING],
+    // No funding note from the backend means no funding box (never sample text).
+    fundingOptions: card.funding_note ? [card.funding_note] : [],
     steps: card.steps.map((step) => {
       const flagInfo = step.flag
         ? FLAG_STATUS_MAP[step.flag] || { status: 'info' as StepStatus, statusText: 'Step' }
@@ -102,8 +91,6 @@ function mapPathwayCardToDisplay(
         statusText: flagInfo.statusText,
       };
     }),
-    childcareSupport: PLACEHOLDER_CHILDCARE,
-    nameDiscrepancyGuide: isTransOrGenderDiverse ? PLACEHOLDER_NAME_DISCREPANCY : undefined,
   };
 }
 
@@ -122,8 +109,6 @@ function mapFallbackToDisplay(fallback: ReturnType<typeof getPathwayWithFallback
       actionLabel: s.actionLabel,
       actionUrl: s.actionUrl,
     })),
-    childcareSupport: fallback.childcareSupport,
-    nameDiscrepancyGuide: fallback.nameDiscrepancyGuide,
   };
 }
 
@@ -155,22 +140,17 @@ function buildPathwayText(pathway: DisplayPathway, occupationTitle: string, nocC
   lines.push(`Estimated time: ${pathway.typicalTime}`);
   lines.push(`Typical cost: ${pathway.typicalCost}`);
   lines.push('');
-  lines.push('Funding options:');
-  pathway.fundingOptions.forEach((opt) => lines.push(`- ${opt}`));
-  lines.push('');
+  if (pathway.fundingOptions.length) {
+    lines.push('Funding options:');
+    pathway.fundingOptions.forEach((opt) => lines.push(`- ${opt}`));
+    lines.push('');
+  }
   lines.push('Step-by-step pathway:');
   pathway.steps.forEach((step) => {
     lines.push(`Step ${step.id}: ${step.title} (${step.statusText})`);
     lines.push(step.description);
     lines.push('');
   });
-  lines.push('Childcare support:');
-  lines.push(pathway.childcareSupport);
-  if (pathway.nameDiscrepancyGuide) {
-    lines.push('');
-    lines.push('Name discrepancy guidance:');
-    lines.push(pathway.nameDiscrepancyGuide);
-  }
   return lines.join('\n');
 }
 
@@ -190,7 +170,7 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
       fetchPathway(match, userInput.province, userInput.documentsAvailable)
       .then((card) => {
         if (!isMounted) return;
-        setPathway(mapPathwayCardToDisplay(card, userInput.province, userInput.isTransOrGenderDiverse));
+        setPathway(mapPathwayCardToDisplay(card, userInput.province));
       })
       .catch((err) => {
         console.error('fetchPathway failed, using fallback data:', err);
@@ -243,7 +223,7 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err: any) {
-      setExportError(err.message || 'Could not export PDF.');
+      setExportError(err.message || t.exportError);
     } finally {
       setIsExporting(false);
     }
@@ -256,7 +236,7 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
     return (
       <div className="mx-auto w-full max-w-[720px] px-5 py-24 flex flex-col items-center gap-4 text-center" role="status" aria-live="polite">
         <Loader2 aria-hidden="true" className="w-7 h-7 text-forest animate-spin" />
-        <p className="m-0 text-[16px] font-medium text-forest">Generating your pathway...</p>
+        <p className="m-0 text-[1rem] font-medium text-forest">{t.generatingPathway}</p>
       </div>
     );
   }
@@ -272,9 +252,9 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
               target="_blank"
               rel="noopener noreferrer"
               referrerPolicy="no-referrer"
-              className="inline-flex items-center gap-1.5 min-h-[40px] text-[14px] font-medium text-forest underline underline-offset-4 decoration-sage"
+              className="inline-flex items-center gap-1.5 min-h-[40px] text-[0.875rem] font-medium text-forest underline underline-offset-4 decoration-sage"
             >
-              <span>View open jobs on Job Bank</span>
+              <span>{t.viewJobBank}</span>
               <ExternalLink aria-hidden="true" className="w-3.5 h-3.5" />
             </a>
           )}
@@ -283,7 +263,7 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
 
       {/* Download */}
       <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center">
-        <label htmlFor="pdf-language" className="sr-only">PDF language</label>
+        <label htmlFor="pdf-language" className="sr-only">{t.pdfLanguage}</label>
         <select
           id="pdf-language"
           value={pdfLanguage}
@@ -291,32 +271,32 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
           className={`${fieldBase} min-h-[48px] sm:w-auto cursor-pointer`}
         >
           <option value="eng_Latn">English</option>
-          <option value="fra_Latn">French</option>
-          <option value="arb_Arab">Arabic</option>
-          <option value="fas_Arab">Persian / Farsi</option>
-          <option value="urd_Arab">Urdu</option>
-          <option value="prs_Arab">Dari</option>
-          <option value="spa_Latn">Spanish</option>
-          <option value="por_Latn">Portuguese</option>
-          <option value="deu_Latn">German</option>
-          <option value="ita_Latn">Italian</option>
-          <option value="tur_Latn">Turkish</option>
-          <option value="ind_Latn">Indonesian</option>
-          <option value="vie_Latn">Vietnamese</option>
-          <option value="pol_Latn">Polish</option>
+          <option value="fra_Latn">Français</option>
+          <option value="arb_Arab">العربية</option>
+          <option value="fas_Arab">فارسی</option>
+          <option value="urd_Arab">اردو</option>
+          <option value="prs_Arab">دری</option>
+          <option value="spa_Latn">Español</option>
+          <option value="por_Latn">Português</option>
+          <option value="deu_Latn">Deutsch</option>
+          <option value="ita_Latn">Italiano</option>
+          <option value="tur_Latn">Türkçe</option>
+          <option value="ind_Latn">Bahasa Indonesia</option>
+          <option value="vie_Latn">Tiếng Việt</option>
+          <option value="pol_Latn">Polski</option>
           <option value="tgl_Latn">Tagalog</option>
-          <option value="som_Latn">Somali</option>
+          <option value="som_Latn">Soomaali</option>
         </select>
         <button type="button" onClick={handleExportPdf} disabled={isExporting} className={btnForest}>
           {isExporting ? (
             <>
               <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
-              <span>Generating...</span>
+              <span>{t.generatingPdf}</span>
             </>
           ) : (
             <>
               <Download aria-hidden="true" className="w-4 h-4" />
-              <span>Download PDF</span>
+              <span>{t.downloadPdf}</span>
             </>
           )}
         </button>
@@ -324,15 +304,15 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
 
       {/* Notices */}
       {exportError && (
-        <p role="alert" className="mt-4 mb-0 flex gap-2 items-start rounded-xl bg-cream px-4 py-3 text-[14px] text-forest-deep">
+        <p role="alert" className="mt-4 mb-0 flex gap-2 items-start rounded-xl bg-cream px-4 py-3 text-[0.875rem] text-forest-deep">
           <AlertCircle aria-hidden="true" className="w-4 h-4 mt-0.5 shrink-0" />
           {exportError}
         </p>
       )}
       {usingFallback && (
-        <p className="mt-4 mb-0 flex gap-2 items-start rounded-xl bg-cream px-4 py-3 text-[14px] text-forest-deep">
+        <p className="mt-4 mb-0 flex gap-2 items-start rounded-xl bg-cream px-4 py-3 text-[0.875rem] text-forest-deep">
           <AlertCircle aria-hidden="true" className="w-4 h-4 mt-0.5 shrink-0" />
-          Showing general guidance — could not reach the pathway generator.
+          {t.fallbackNotice}
         </p>
       )}
 
@@ -340,17 +320,17 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-start">
         <div className="flex flex-col gap-1.5 rounded-xl bg-cream px-5 py-4">
           <Eyebrow>{t.estTime}</Eyebrow>
-          <span dir="auto" className="font-serif text-[24px] leading-[1.2] font-semibold text-forest">{pathway.typicalTime}</span>
+          <span dir="auto" className="font-serif text-[1.5rem] leading-[1.2] font-semibold text-forest">{pathway.typicalTime}</span>
         </div>
         <div className="flex flex-col gap-1.5 rounded-xl bg-cream px-5 py-4">
           <Eyebrow>{t.estCost}</Eyebrow>
-          <span dir="auto" className="font-serif text-[24px] leading-[1.2] font-semibold text-forest">{pathway.typicalCost}</span>
+          <span dir="auto" className="font-serif text-[1.5rem] leading-[1.2] font-semibold text-forest">{pathway.typicalCost}</span>
         </div>
       </div>
 
       {/* Steps */}
       <section className="mt-12 text-start">
-        <h2 dir="auto" className="m-0 text-[28px] leading-[1.15] font-semibold text-forest">Your Step-by-Step Licensing Map</h2>
+        <h2 dir="auto" className="m-0 text-[1.75rem] leading-[1.15] font-semibold text-forest">{t.licensingMapTitle}</h2>
         <ol className="mt-6 list-none p-0 m-0 flex flex-col">
           {pathway.steps.map((step, i) => (
             <li key={step.id} className="relative flex gap-4 pb-8">
@@ -358,27 +338,27 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
               {i < pathway.steps.length - 1 && (
                 <span aria-hidden="true" className="absolute top-9 bottom-0 start-[15px] w-px bg-line" />
               )}
-              <span aria-hidden="true" className="relative z-[1] shrink-0 w-[31px] h-[31px] rounded-full bg-forest text-cream font-mono text-[13px] flex items-center justify-center">
+              <span aria-hidden="true" className="relative z-[1] shrink-0 w-[31px] h-[31px] rounded-full bg-forest text-cream font-mono text-[0.8125rem] flex items-center justify-center">
                 {step.id}
               </span>
               <div className="flex flex-col gap-2 min-w-0 pt-0.5">
-                <h3 dir="auto" className="m-0 font-sans text-[17px] leading-[1.35] font-semibold text-forest-deep">
-                  <span className="sr-only">Step {step.id}: </span>{step.title}
+                <h3 dir="auto" className="m-0 font-sans text-[1.0625rem] leading-[1.35] font-semibold text-forest-deep">
+                  <span className="sr-only">{t.stepWord} {step.id}: </span>{step.title}
                 </h3>
                 {/* The generic "Step" tag repeats the number, so only real tags show. */}
                 {step.statusText !== 'Step' && (
-                  <span className="self-start rounded-md border border-line px-2 py-0.5 text-[12px] font-medium text-sage-dark">
-                    {step.statusText}
+                  <span className="self-start rounded-md border border-line px-2 py-0.5 text-[0.75rem] font-medium text-sage-dark">
+                    {t[STATUS_TRANSLATION_KEYS[step.statusText]] ?? step.statusText}
                   </span>
                 )}
-                <p dir="auto" className="m-0 text-[15px] leading-[1.6] text-forest-deep">{step.description}</p>
+                <p dir="auto" className="m-0 text-[0.9375rem] leading-[1.6] text-forest-deep">{step.description}</p>
                 {step.actionLabel && step.actionUrl && (
                   <a
                     href={step.actionUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     referrerPolicy="no-referrer"
-                    className="self-start inline-flex items-center gap-1.5 min-h-[40px] text-[14px] font-medium text-forest underline underline-offset-4 decoration-sage"
+                    className="self-start inline-flex items-center gap-1.5 min-h-[40px] text-[0.875rem] font-medium text-forest underline underline-offset-4 decoration-sage"
                   >
                     <span>{step.actionLabel}</span>
                     <ExternalLink aria-hidden="true" className="w-3.5 h-3.5" />
@@ -390,37 +370,25 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
         </ol>
       </section>
 
-      {/* Funding */}
+      {/* Funding (only when the pathway has real funding information) */}
+      {pathway.fundingOptions.length > 0 && (
       <section className="rounded-2xl bg-cream px-6 py-5 text-start">
         <Eyebrow>{t.fundingEarly}</Eyebrow>
-        <ul className="mt-3 mb-0 ps-5 flex flex-col gap-2 text-[15px] leading-[1.6] text-forest-deep list-disc">
+        <ul className="mt-3 mb-0 ps-5 flex flex-col gap-2 text-[0.9375rem] leading-[1.6] text-forest-deep list-disc">
           {pathway.fundingOptions.map((opt, i) => (
             <li key={i} dir="auto">{opt}</li>
           ))}
         </ul>
       </section>
-
-      {/* Name change and document mismatch guide */}
-      {(userInput.isTransOrGenderDiverse || pathway.nameDiscrepancyGuide) && (
-        <section className="mt-4 rounded-2xl border-[1.5px] border-line bg-paper px-6 py-5 text-start flex flex-col gap-3">
-          <Eyebrow>{t.transGuidanceTitle}</Eyebrow>
-          <p className="m-0 text-[15px] leading-[1.6] text-forest-deep">
-            Many trans and non-binary refugees encounter significant name mismatches on educational transcripts from their birth countries.
-            Canadian human rights frameworks guarantee preferred name processing:
-          </p>
-          <p className="m-0 rounded-xl bg-cream px-4 py-3 text-[15px] leading-[1.6] font-medium text-forest">
-            {pathway.nameDiscrepancyGuide || "Submit a direct statutory declaration of transition alongside any settlement letter to have provincial regulators override database deadnames safely without public history disclosure."}
-          </p>
-        </section>
       )}
 
       {/* Next */}
       <div className="mt-10 flex flex-col sm:flex-row gap-3">
         <button type="button" onClick={onFindSupport} className={`${btnGold} flex-1`}>
-          Find Support Organizations Near You
+          {t.findSupportCTA}
         </button>
         <button type="button" onClick={onReset} className={btnQuiet}>
-          Start New Search
+          {t.startNewSearch}
         </button>
       </div>
     </div>
