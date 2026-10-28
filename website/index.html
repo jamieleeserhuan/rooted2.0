@@ -1,0 +1,1177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rooted: your work still counts here</title>
+<meta name="description" content="Rooted is a free, private tool for refugees arriving in Canada. Describe your work in your own words and see where it fits, with clear steps, time, cost, and funding.">
+<meta name="theme-color" content="#1F3A2B">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Rooted: your work still counts here">
+<meta property="og:description" content="Tell Rooted what you've done. Find where it fits in Canada. Free. Nothing you type is saved.">
+<meta property="og:image" content="images/og.jpg">
+<link rel="icon" type="image/png" href="images/icon-64.png">
+<link rel="apple-touch-icon" href="images/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#1F3A2B}
+a{color:#EFE6D2}a:hover{color:#C9A86A}
+a:focus-visible,button:focus-visible{outline:2px solid #C9A86A;outline-offset:3px}
+.r-hero{position:relative;min-height:900px;overflow:hidden}
+.r-canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;pointer-events:none}
+.r-nav{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 24px;padding:16px 40px;box-sizing:border-box}
+.r-links{display:flex;align-items:center;flex-wrap:wrap;gap:4px 28px}
+.r-stage{position:relative;z-index:2;min-height:900px;display:flex;align-items:center;justify-content:center;padding:104px 40px 72px;box-sizing:border-box}
+.r-flip{position:relative;width:40%;max-width:640px;aspect-ratio:4/5;margin:0}
+.r-copy{position:absolute;z-index:3;left:56px;bottom:64px;width:calc(30% - 88px);min-width:280px;max-width:420px}
+.r-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.r-sec{padding:128px 40px;box-sizing:border-box}
+.r-wrap{max-width:1120px;margin:0 auto}
+.r-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:56px}
+.r-dstage{min-height:660px;padding:48px;box-sizing:border-box}
+.r-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.r-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.r-sec a.r-ul:hover{color:inherit;text-decoration-thickness:2px}
+@keyframes r-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes r-grow{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:none}}
+@keyframes r-blink{50%{opacity:0}}
+.r-card-in{animation:r-in 460ms cubic-bezier(.2,.7,.2,1) both}
+.r-grow{animation:r-grow 520ms cubic-bezier(.2,.7,.2,1) both;transform-origin:top left}
+.r-caret{animation:r-blink 1s steps(1) infinite}
+@media (prefers-reduced-motion: reduce){.r-card-in,.r-grow,.r-caret{animation:none}}
+@media (max-width:900px){
+.r-sec{padding:88px 20px}
+.r-grid3{grid-template-columns:minmax(0,1fr);gap:48px}
+.r-dstage{min-height:980px;padding:24px 18px}
+.r-cards{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:520px){.r-meta{grid-template-columns:minmax(0,1fr)}}
+html{scroll-behavior:smooth}
+.r-page{overflow-x:clip}
+.r-copy{isolation:isolate}
+.r-copy::before{content:"";position:absolute;z-index:-1;left:-80px;right:-40px;top:-64px;bottom:-56px;background:radial-gradient(closest-side,rgba(31,58,43,0.95),rgba(31,58,43,0.82) 55%,rgba(31,58,43,0));pointer-events:none}
+.r-reveal{opacity:0;transform:translateY(24px);transition:opacity 700ms ease-out,transform 700ms cubic-bezier(.2,.7,.2,1)}
+.r-reveal.r-on{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.r-reveal{opacity:1;transform:none;transition:none}}
+@media (max-width:1180px){
+.r-hero{min-height:0}
+.r-nav{position:relative;padding:16px 24px}
+.r-stage{min-height:0;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:40px;padding:24px 24px 64px}
+.r-flip{width:min(78%,440px);align-self:center}
+.r-copy{position:relative;left:auto;bottom:auto;width:auto;min-width:0;max-width:560px}
+}
+@media (max-width:640px){
+.r-nav{padding:12px 16px}
+.r-links{width:100%;justify-content:space-between;gap:0 8px}
+.r-stage{padding:16px 16px 56px}
+.r-flip{width:min(86%,400px)}
+}
+</style>
+<style>[hidden]{display:none!important}</style>
+</head>
+<body>
+<div class="r-page" style="background: #1F3A2B; font-family: Inter, 'DM Sans', system-ui, sans-serif">
+<div class="r-hero" id="top"data-ref="hero" style="background: #1F3A2B; color: #EFE6D2; font-family: Inter, 'DM Sans', system-ui, sans-serif">
+<canvas class="r-canvas" data-ref="canvas" aria-hidden="true"></canvas>
+
+<header class="r-nav">
+<a href="#top" data-ref="brand" style="display: flex; align-items: center; min-height: 48px; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 28px; letter-spacing: -0.01em; color: #EFE6D2; text-decoration: none">Rooted</a>
+<nav class="r-links" aria-label="Main" data-ref="links">
+<a href="#how" style="display: flex; align-items: center; min-height: 48px; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none">How it works</a>
+<a href="#demo" style="display: flex; align-items: center; min-height: 48px; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none">Demo</a>
+<a href="#privacy" style="display: flex; align-items: center; min-height: 48px; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none">Privacy</a>
+<a href="#about" style="display: flex; align-items: center; min-height: 48px; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none">About</a>
+<a href="https://rooted2-0.vercel.app" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; min-height: 48px; padding: 0 22px; box-sizing: border-box; border: 1px solid rgba(239, 230, 210, 0.55); border-radius: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; color: #EFE6D2; background: rgba(20, 42, 30, 0.6)">Try Rooted<span class="r-sr"> (opens in a new tab)</span></a>
+</nav>
+</header>
+
+<main class="r-stage">
+<figure class="r-flip" data-ref="flip">
+<div aria-hidden="true" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0">
+<div data-layer style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 22px 48px rgba(10, 22, 15, 0.45); background: #6b6450"><img alt="" decoding="async" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover"></div>
+<div data-layer style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 22px 48px rgba(10, 22, 15, 0.45); background: #6b6450"><img alt="" decoding="async" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover"></div>
+<div data-layer style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 22px 48px rgba(10, 22, 15, 0.45); background: #6b6450"><img alt="" decoding="async" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover"></div>
+<div data-layer style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 22px 48px rgba(10, 22, 15, 0.45); background: #6b6450"><img alt="" decoding="async" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover"></div>
+
+<canvas data-ref="grain" width="240" height="300" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: 16px; mix-blend-mode: overlay; opacity: 0.55; pointer-events: none"></canvas>
+</div>
+<figcaption class="r-sr">Photos of people at work: a writer, a hospital, a farm, an engine bay, a classroom, a library, an office and a gym.</figcaption>
+<button type="button" data-ref="pause" aria-label="Pause photos" aria-pressed="false" style="position: absolute; right: 14px; bottom: 14px; z-index: 10; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 999px; border: 1px solid rgba(239, 230, 210, 0.5); background: rgba(20, 42, 30, 0.82); color: #EFE6D2; cursor: pointer">
+<span data-icon="play" hidden>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7 5l12 7-12 7z"></path></svg>
+</span>
+<span data-icon="pause">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14"></path><path d="M15 5v14"></path></svg>
+</span>
+</button>
+</figure>
+
+<div class="r-copy" data-ref="copy" style="display: flex; flex-direction: column; gap: 20px">
+<h1 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: clamp(40px, 3.8vw, 58px); line-height: 1.04; letter-spacing: -0.015em; color: #EFE6D2; text-wrap: balance">Your work still counts here.</h1>
+<p style="margin: 0; font-size: 18px; line-height: 1.5; color: #EFE6D2; text-wrap: pretty">Tell Rooted what you've done. Find where it fits in Canada.</p>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 4px">
+<a href="https://rooted2-0.vercel.app" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; min-height: 52px; padding: 0 28px; box-sizing: border-box; border-radius: 10px; background: #C9A86A; color: #1F3A2B; font-size: 16px; font-weight: 600; text-decoration: none">Try Rooted<span class="r-sr"> (opens in a new tab)</span></a>
+<a href="#demo" style="display: flex; align-items: center; gap: 8px; min-height: 48px; font-size: 16px; font-weight: 500; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: #8FA68E">See how it works <span aria-hidden="true" style="font-family: 'JetBrains Mono', monospace; color: #8FA68E">↓</span></a>
+</div>
+<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #8FA68E">Free. Nothing you type is saved.</p>
+</div>
+</main>
+
+<p class="r-sr">Rooted can help people with work experience such as: author, social media manager, anesthesiologist, farmer, aeronautical engineer, elementary school teacher, librarian, social worker, investment banker, fitness coach, plumber, nuclear engineer, nurse practitioner, chef, truck driver, early childhood educator, welder, pharmacist, carpenter, software developer, farm worker, hairstylist, electrician, accountant, translator, dental assistant, mechanic, teacher, caregiver, baker, civil engineer, architect, tailor, lab technician.</p>
+</div>
+
+<section id="how" class="r-sec" style="background: #EFE6D2; color: #1F3A2B">
+<div class="r-wrap r-reveal" data-rv="how" data-ref="sec" style="display: flex; flex-direction: column; gap: 72px">
+<h2 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: clamp(36px, 4vw, 56px); line-height: 1.05; letter-spacing: -0.015em">How it works</h2>
+<ol class="r-grid3" style="list-style: none; margin: 0; padding: 0">
+<li style="display: flex; flex-direction: column; gap: 16px">
+<svg width="132" height="88" viewBox="0 0 132 88" fill="none" stroke="#1F3A2B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h82a8 8 0 0 1 8 8v36a8 8 0 0 1-8 8H40l-16 14V64H8a8 8 0 0 1-8-8V20a8 8 0 0 1 8-8z" transform="translate(4 0)"></path><path d="M22 30h56"></path><path d="M22 42h44"></path><path d="M22 54h28"></path><path d="M104 58l18-18 6 6-18 18-8 2z"></path></svg>
+<span style="font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 500; font-size: 88px; line-height: 0.9; color: #1F3A2B">1</span>
+<h3 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 28px; line-height: 1.15">Tell us what you've done.</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #1F3A2B">Describe your work in your own words. Formal or informal, with or without documents.</p>
+</li>
+<li style="display: flex; flex-direction: column; gap: 16px">
+<svg width="132" height="88" viewBox="0 0 132 88" fill="none" stroke="#1F3A2B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="20" cy="44" r="10"></circle><path d="M30 44c20 0 24-28 46-28"></path><path d="M30 44h46"></path><path d="M30 44c20 0 24 28 46 28"></path><rect x="78" y="6" width="44" height="20" rx="5"></rect><rect x="78" y="34" width="44" height="20" rx="5"></rect><rect x="78" y="62" width="44" height="20" rx="5"></rect></svg>
+<span style="font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 500; font-size: 88px; line-height: 0.9; color: #1F3A2B">2</span>
+<h3 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 28px; line-height: 1.15">See where it fits.</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #1F3A2B">Rooted matches your experience to Canadian occupations.</p>
+</li>
+<li style="display: flex; flex-direction: column; gap: 16px">
+<svg width="132" height="88" viewBox="0 0 132 88" fill="none" stroke="#1F3A2B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="22" y="4" width="76" height="80" rx="8"></rect><path d="M36 22h48"></path><circle cx="40" cy="40" r="3"></circle><path d="M50 40h32"></path><circle cx="40" cy="54" r="3"></circle><path d="M50 54h26"></path><circle cx="40" cy="68" r="3"></circle><path d="M50 68h30"></path><path d="M104 30l8 8 14-16"></path></svg>
+<span style="font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 500; font-size: 88px; line-height: 0.9; color: #1F3A2B">3</span>
+<h3 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 28px; line-height: 1.15">Get your pathway.</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #1F3A2B">A clear card with steps, time, cost, and funding you can apply for.</p>
+</li>
+</ol>
+</div>
+</section>
+
+<section id="demo" class="r-sec" style="background: #1F3A2B; color: #EFE6D2">
+<div class="r-wrap r-reveal" data-rv="demo" data-ref="sec" style="display: flex; flex-direction: column; gap: 48px">
+<h2 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: clamp(36px, 4vw, 56px); line-height: 1.05; letter-spacing: -0.015em; color: #EFE6D2">See Rooted in action.</h2>
+<figure data-ref="demo" style="margin: 0; border-radius: 18px; overflow: hidden; background: #EFE6D2; box-shadow: 0 30px 70px rgba(10, 22, 15, 0.45)">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px 8px 20px; background: #EFE6D2; border-bottom: 1px solid #C9BFA6">
+<div style="display: flex; align-items: center; gap: 16px; min-width: 0">
+<div aria-hidden="true" style="display: flex; gap: 8px"><span style="width: 11px; height: 11px; border-radius: 999px; border: 1.5px solid #8FA68E"></span><span style="width: 11px; height: 11px; border-radius: 999px; border: 1.5px solid #8FA68E"></span><span style="width: 11px; height: 11px; border-radius: 999px; border: 1.5px solid #8FA68E"></span></div>
+<span aria-hidden="true" style="padding: 6px 14px; border-radius: 999px; background: #F7F1E3; color: #4A6352; font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">https://rooted2-0.vercel.app</span>
+</div>
+<div style="display: flex; gap: 4px">
+<button type="button" data-ref="demoToggle" aria-label="Pause demo" aria-pressed="false" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; padding: 0; border: 0; border-radius: 10px; background: transparent; color: #1F3A2B; cursor: pointer">
+<span data-icon="play" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7 5l12 7-12 7z"></path></svg></span>
+<span data-icon="pause"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14"></path><path d="M15 5v14"></path></svg></span>
+</button>
+<button type="button" data-ref="demoReplay" aria-label="Replay demo" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; padding: 0; border: 0; border-radius: 10px; background: transparent; color: #1F3A2B; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"></path><path d="M4 4v5h5"></path></svg>
+</button>
+</div>
+</div>
+<figcaption class="r-sr">Animated demo. A person types: I cooked for 8 years at my family's restaurant. I managed the kitchen and trained new staff. Rooted suggests three matches: Cook, Chef, and Food service supervisor. The Cook match opens into a pathway card with steps, estimated time, estimated cost, funding sources, and a button to export it as a PDF.</figcaption>
+<!-- DEMO VIDEO SLOT: to use a screen recording, replace everything inside the div below with <video src="..." autoplay muted loop playsinline style="width:100%;display:block"></video> -->
+<div class="r-dstage" data-slot="demo-video" aria-hidden="true" style="background: #F7F1E3; color: #142A1E">
+
+<div data-phase="input">
+<div style="max-width: 640px; margin: 40px auto 0; display: flex; flex-direction: column; gap: 18px">
+<span style="font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 30px; line-height: 1.15; color: #1F3A2B">What work have you done?</span>
+<span style="font-size: 15px; line-height: 1.5; color: #4A6352">Use your own words. Any language is fine.</span>
+<div style="min-height: 168px; padding: 20px 22px; box-sizing: border-box; border: 1.5px solid #8FA68E; border-radius: 12px; background: #FBF7EE; font-size: 19px; line-height: 1.55; color: #142A1E"><span data-ref="typed"></span><span class="r-caret" data-ref="caret" style="color: #1F3A2B">|</span></div>
+<span style="align-self: flex-start; display: flex; align-items: center; min-height: 52px; padding: 0 26px; border-radius: 10px; font-size: 16px; font-weight: 600; color: #1F3A2B; transition: transform 120ms ease, background 120ms ease; background: #C9A86A" data-ref="dbtn">Find my pathway</span>
+</div>
+</div>
+
+<div data-phase="cards" hidden>
+<div style="display: flex; flex-direction: column; gap: 24px">
+<span style="font-size: 14px; line-height: 1.5; color: #4A6352">You said: "I cooked for 8 years at my family's restaurant…"</span>
+<span style="font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 30px; line-height: 1.15; color: #1F3A2B">Where your work fits</span>
+<div class="r-cards">
+
+<div class="r-card-in" style="display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 14px; background: #FBF7EE; border: 1.5px solid #C9BFA6; animation-delay: 0ms">
+<span style="font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: #4A6352">NOC 63200</span>
+<span style="font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 24px; line-height: 1.15; color: #1F3A2B">Cook</span>
+<span style="font-size: 15px; line-height: 1.5; color: #142A1E">Eight years of cooking for customers is cook experience.</span>
+</div>
+
+<div class="r-card-in" style="display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 14px; background: #FBF7EE; border: 1.5px solid #C9BFA6; animation-delay: 260ms">
+<span style="font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: #4A6352">NOC 62200</span>
+<span style="font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 24px; line-height: 1.15; color: #1F3A2B">Chef</span>
+<span style="font-size: 15px; line-height: 1.5; color: #142A1E">You ran the kitchen. That counts toward chef work.</span>
+</div>
+
+<div class="r-card-in" style="display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 14px; background: #FBF7EE; border: 1.5px solid #C9BFA6; animation-delay: 520ms">
+<span style="font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: #4A6352">NOC 62020</span>
+<span style="font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 24px; line-height: 1.15; color: #1F3A2B">Food service supervisor</span>
+<span style="font-size: 15px; line-height: 1.5; color: #142A1E">You trained new staff. That is supervisor work.</span>
+</div>
+
+</div>
+</div>
+</div>
+
+<div data-phase="path" hidden>
+<div class="r-grow" style="max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; padding: clamp(18px, 4vw, 32px); box-sizing: border-box; border-radius: 16px; background: #FBF7EE; border: 1.5px solid #1F3A2B">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: #4A6352">NOC 63200 · YOUR PATHWAY</span>
+<span style="font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 32px; line-height: 1.1; color: #1F3A2B">Cook</span>
+</div>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px">
+
+<li class="r-card-in" style="display: flex; gap: 14px; align-items: flex-start; animation-delay: 200ms">
+<span style="flex: none; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: #1F3A2B; color: #EFE6D2; font-family: 'JetBrains Mono', monospace; font-size: 13px">1</span>
+<span style="display: flex; flex-direction: column; gap: 2px; font-size: 15px; line-height: 1.5; color: #142A1E"><strong style="font-weight: 600">Get a letter about your work.</strong><span>Ask the restaurant to describe your duties and years. No letter? A settlement worker can help you write a statement.</span></span>
+</li>
+
+<li class="r-card-in" style="display: flex; gap: 14px; align-items: flex-start; animation-delay: 360ms">
+<span style="flex: none; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: #1F3A2B; color: #EFE6D2; font-family: 'JetBrains Mono', monospace; font-size: 13px">2</span>
+<span style="display: flex; flex-direction: column; gap: 2px; font-size: 15px; line-height: 1.5; color: #142A1E"><strong style="font-weight: 600">Take a food handler course.</strong><span>A short course, often one day. Many cities offer it online.</span></span>
+</li>
+
+<li class="r-card-in" style="display: flex; gap: 14px; align-items: flex-start; animation-delay: 520ms">
+<span style="flex: none; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: #1F3A2B; color: #EFE6D2; font-family: 'JetBrains Mono', monospace; font-size: 13px">3</span>
+<span style="display: flex; flex-direction: column; gap: 2px; font-size: 15px; line-height: 1.5; color: #142A1E"><strong style="font-weight: 600">Apply to challenge the Red Seal Cook exam.</strong><span>Experienced cooks can apply through their province’s apprenticeship office.</span></span>
+</li>
+
+<li class="r-card-in" style="display: flex; gap: 14px; align-items: flex-start; animation-delay: 680ms">
+<span style="flex: none; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: #1F3A2B; color: #EFE6D2; font-family: 'JetBrains Mono', monospace; font-size: 13px">4</span>
+<span style="display: flex; flex-direction: column; gap: 2px; font-size: 15px; line-height: 1.5; color: #142A1E"><strong style="font-weight: 600">Work as a cook while you prepare.</strong><span>Your hours in Canada count toward your application.</span></span>
+</li>
+
+</ol>
+<div class="r-meta">
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 10px; background: #EFE6D2"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #4A6352">Estimated time</span><span style="font-size: 18px; font-weight: 600; color: #1F3A2B">3 to 12 months</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 10px; background: #EFE6D2"><span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #4A6352">Estimated cost</span><span style="font-size: 18px; font-weight: 600; color: #1F3A2B">$150 to $600</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #4A6352">Funding you can apply for</span>
+<span style="font-size: 15px; line-height: 1.6; color: #142A1E">Provincial skills training grants · Settlement agency employment programs · Canada Apprentice Loan, if you train as an apprentice</span>
+</div>
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 22px; border-radius: 10px; background: #1F3A2B; color: #EFE6D2; font-size: 15px; font-weight: 600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>Export as PDF</span>
+</div>
+</div>
+
+</div>
+</figure>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center">
+<a href="https://rooted2-0.vercel.app" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; min-height: 60px; padding: 0 40px; box-sizing: border-box; border-radius: 12px; background: #C9A86A; color: #1F3A2B; font-size: 18px; font-weight: 600; text-decoration: none">Try it yourself<span class="r-sr"> (opens in a new tab)</span></a>
+<p style="margin: 0; max-width: 520px; font-size: 16px; line-height: 1.55; color: #8FA68E">Bring your pathway card to a settlement agency or social services worker.</p>
+</div>
+</div>
+</section>
+
+<section id="privacy" class="r-sec" style="background: #EFE6D2; color: #1F3A2B">
+<div class="r-wrap r-reveal" data-rv="privacy" data-ref="sec" style="display: flex; flex-direction: column; gap: 64px">
+<h2 style="margin: 0; max-width: 720px; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: clamp(36px, 4vw, 56px); line-height: 1.05; letter-spacing: -0.015em">What you share stays with you.</h2>
+<ul class="r-grid3" style="list-style: none; margin: 0; padding: 0">
+<li style="display: flex; flex-direction: column; gap: 14px">
+<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1F3A2B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"></ellipse><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"></path><path d="M3 3l18 18"></path></svg>
+<h3 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 26px; line-height: 1.15">Nothing is stored.</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.6">Your words are never saved anywhere.</p>
+</li>
+<li style="display: flex; flex-direction: column; gap: 14px">
+<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1F3A2B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M9 8h6"></path><path d="M9 12h6"></path><path d="M3 3l18 18"></path></svg>
+<h3 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 26px; line-height: 1.15">Nothing is logged.</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.6">No account. No record of who you are or what you typed.</p>
+</li>
+<li style="display: flex; flex-direction: column; gap: 14px">
+<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1F3A2B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18"></path><path d="M10 13l4 4"></path><path d="M14 13l-4 4"></path></svg>
+<h3 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 26px; line-height: 1.15">Gone when you close the page.</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.6">Everything is deleted the moment you leave.</p>
+</li>
+</ul>
+</div>
+</section>
+
+<section class="r-sec" style="background: #1F3A2B; color: #EFE6D2">
+<div class="r-wrap r-reveal" data-rv="who" data-ref="sec" style="display: flex; flex-direction: column; gap: 32px; max-width: 820px">
+<h2 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: clamp(36px, 4vw, 56px); line-height: 1.05; letter-spacing: -0.015em; color: #EFE6D2">Who it's for</h2>
+<p style="margin: 0; font-size: 20px; line-height: 1.65; color: #EFE6D2; text-wrap: pretty">Rooted is for people who don't know where to start. For people who feel too overwhelmed to reach out yet. For people whose work never came with a certificate.</p>
+<p style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 500; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.25; color: #C9A86A">Rooted meets you where you are.</p>
+</div>
+</section>
+
+<section id="about" class="r-sec" style="background: #EFE6D2; color: #1F3A2B">
+<div class="r-wrap r-reveal" data-rv="about" data-ref="sec" style="display: flex; flex-direction: column; gap: 28px; max-width: 820px">
+<h2 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: clamp(36px, 4vw, 56px); line-height: 1.05; letter-spacing: -0.015em">About</h2>
+<p style="margin: 0; font-size: 20px; line-height: 1.65; text-wrap: pretty">Rooted is an independent, open-source project. It was built for one reason: so anyone starting over in Canada can see where their experience fits, for free. The code is open, so anyone can read it, check it, and help make it better.</p>
+<a class="r-ul" href="https://github.com/jamieleeserhuan/rooted2.0" target="_blank" rel="noopener noreferrer" style="align-self: flex-start; display: flex; align-items: center; gap: 10px; min-height: 48px; font-size: 17px; font-weight: 600; color: #1F3A2B; text-decoration: underline; text-underline-offset: 6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5"></path><path d="M16 7l5 5-5 5"></path></svg>See the code on GitHub</a>
+</div>
+</section>
+
+<section class="r-sec" style="background: #1F3A2B; color: #EFE6D2">
+<div class="r-wrap r-reveal" data-rv="cta" data-ref="sec" style="display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center">
+<h2 style="margin: 0; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: clamp(36px, 4.4vw, 64px); line-height: 1.05; letter-spacing: -0.015em; color: #EFE6D2">Your work still counts here.</h2>
+<a href="https://rooted2-0.vercel.app" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; min-height: 60px; padding: 0 44px; box-sizing: border-box; border-radius: 12px; background: #C9A86A; color: #1F3A2B; font-size: 18px; font-weight: 600; text-decoration: none">Try Rooted<span class="r-sr"> (opens in a new tab)</span></a>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #8FA68E">Free. No account. Nothing saved.</p>
+</div>
+</section>
+
+<footer class="r-sec" style="padding-top: 56px; padding-bottom: 56px; background: #142A1E; color: #EFE6D2">
+<div class="r-wrap" style="display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px">
+<a href="#top" style="display: flex; align-items: center; min-height: 48px; font-family: Fraunces, 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 28px; color: #EFE6D2; text-decoration: none">Rooted</a>
+<nav aria-label="Footer" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 28px">
+<a href="#how" style="display: flex; align-items: center; min-height: 48px; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none">How it works</a>
+<a href="#demo" style="display: flex; align-items: center; min-height: 48px; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none">Demo</a>
+<a href="#privacy" style="display: flex; align-items: center; min-height: 48px; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none">Privacy</a>
+<a href="#about" style="display: flex; align-items: center; min-height: 48px; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none">About</a>
+<a href="https://github.com/jamieleeserhuan/rooted2.0" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; min-height: 48px; font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none">GitHub</a>
+</nav>
+</div>
+<p style="margin: 0; padding-top: 24px; border-top: 1px solid rgba(143, 166, 142, 0.35); font-size: 14px; line-height: 1.5; color: #8FA68E">Rooted gives guidance, not legal or immigration advice.</p>
+</div>
+</footer>
+</div>
+<script>
+
+class DCLogic {
+  constructor(props) { this.props = props || {}; this.state = {}; }
+  setState(u) {
+    Object.assign(this.state, typeof u === 'function' ? u(this.state) : u);
+    if (this._rq) return;
+    this._rq = requestAnimationFrame(() => { this._rq = 0; this.render(); });
+  }
+  render() {}
+}
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.D = this.makeData();
+    this.reduced = false;
+    this.touch = false;
+    this.hist = [
+      { i: 8, rot: 2.1, dx: 7, dy: -5 },
+      { i: 6, rot: -2.4, dx: -6, dy: 4 },
+      { i: 0, rot: 1.2, dx: 3, dy: 6 },
+      { i: 3, rot: -0.8, dx: -2, dy: -1 }
+    ];
+    this.order = this.shuffle(this.D.envs.map((e, i) => i));
+    this.pos = 0;
+    this.holdUntil = 0;
+    this.words = [];
+    this.oq = this.shuffle(this.D.occ.map((o, i) => i));
+    this.G = null;
+    this.dirty = true;
+    this.lastDraw = 0;
+    this.lastTrig = 0;
+    this.state = { tick: 0, paused: false };
+
+    this.setHero = (el) => { this.heroEl = el; };
+    this.setCanvas = (el) => { this.cvEl = el; };
+    this.setFlip = (el) => { this.flipEl = el; };
+    this.setCopy = (el) => { this.copyEl = el; };
+    this.setBrand = (el) => { this.brandEl = el; };
+    this.setLinks = (el) => { this.linksEl = el; };
+    this.setGrain = (el) => { this.grainEl = el; };
+    this.togglePause = () => this.setState((s) => ({ paused: !s.paused }));
+    this.onMove = (e) => this.handleMove(e);
+    this.onLeave = () => { this.mouse = null; };
+    this.onDown = (e) => this.handleDown(e);
+    this.loop = (ts) => this.frame(ts);
+
+    this.demoText = "I cooked for 8 years at my family's restaurant. I managed the kitchen and trained new staff.";
+    this.demoMs = 0;
+    this.demoLast = 0;
+    this.demoPlaying = true;
+    this.demoVisible = false;
+    this.dKey = '';
+    this.setDemo = (el) => { this.demoEl = el; };
+    this.rv = { how: '', demo: '', privacy: '', who: '', about: '', cta: '' };
+    this.secEls = {};
+    this.setSec = (el) => { if (el) this.secEls[el.getAttribute('data-rv')] = el; };
+    this.toggleDemo = () => {
+      this.demoPlaying = !this.demoPlaying;
+      this.demoLast = performance.now();
+      this.demoSync(true);
+    };
+    this.replayDemo = () => {
+      this.demoMs = 0;
+      this.demoPlaying = true;
+      this.demoLast = performance.now();
+      this.demoSync(true);
+    };
+  }
+
+  /* ---------- demo walkthrough ---------- */
+
+  demoTimes() {
+    const typeStart = 400, per = 32;
+    const typeEnd = typeStart + this.demoText.length * per;
+    const pressAt = typeEnd + 600;
+    const pressEnd = pressAt + 350;
+    const loadEnd = pressEnd + 900;
+    const expandAt = loadEnd + 3200;
+    const end = expandAt + 7000;
+    return { typeStart, per, pressAt, pressEnd, loadEnd, expandAt, end };
+  }
+
+  demoView(t) {
+    const T = this.demoTimes();
+    if (t < T.pressAt) {
+      const chars = Math.max(0, Math.min(this.demoText.length, Math.floor((t - T.typeStart) / T.per)));
+      return { phase: 'type', chars };
+    }
+    const all = this.demoText.length;
+    if (t < T.pressEnd) return { phase: 'press', chars: all };
+    if (t < T.loadEnd) return { phase: 'load', chars: all };
+    if (t < T.expandAt) return { phase: 'cards', chars: all };
+    return { phase: 'path', chars: all };
+  }
+
+  demoTick() {
+    const now = performance.now();
+    const dt = this.demoLast ? now - this.demoLast : 0;
+    this.demoLast = now;
+    if (this.demoPlaying && this.demoVisible) {
+      this.demoMs = (this.demoMs + Math.min(dt, 200)) % this.demoTimes().end;
+    }
+    this.demoSync(false);
+  }
+
+  demoSync(force) {
+    const v = this.demoView(this.demoMs);
+    const key = v.phase + ':' + v.chars + ':' + this.demoPlaying;
+    if (force || key !== this.dKey) {
+      this.dKey = key;
+      this.setState((s) => ({ tick: s.tick + 1 }));
+    }
+  }
+
+  makeData() {
+    // Photos are pre-graded (4:5, 960x1200, matched brightness). To add one: upload it, add a row here.
+    const envs = [
+      { name: 'Author', shot: 'Writing desk', h: 70, src: 'images/author.jpg' },
+      { name: 'Social media manager', shot: 'Studio floor', h: 60, src: 'images/social-media-manager.jpg' },
+      { name: 'Anesthesiologist', shot: 'Hospital corridor', h: 120, src: 'images/anesthesiologist.jpg' },
+      { name: 'Farmer', shot: 'Hands in soil', h: 110, src: 'images/farmer.jpg' },
+      { name: 'Aeronautical engineer', shot: 'Engine bay', h: 76, src: 'images/aeronautical-engineer.jpg' },
+      { name: 'Elementary school teacher', shot: 'Classroom', h: 130, src: 'images/elementary-teacher.jpg' },
+      { name: 'Librarian', shot: 'Library stacks', h: 50, src: 'images/librarian.jpg' },
+      { name: 'Social worker', shot: 'Meeting room', h: 66, src: 'images/social-worker.jpg' },
+      { name: 'Investment banker', shot: 'Office at night', h: 88, src: 'images/investment-banker.jpg' },
+      { name: 'Fitness coach', shot: 'Gym', h: 45, src: 'images/fitness-coach.jpg' }
+    ];
+    // [word, photo index]; -1 = reveals without pausing the flipbook.
+    const occ = [
+      ['AUTHOR', 0], ['SOCIAL MEDIA MANAGER', 1], ['ANESTHESIOLOGIST', 2], ['FARMER', 3],
+      ['AERONAUTICAL ENGINEER', 4], ['ELEMENTARY SCHOOL TEACHER', 5], ['LIBRARIAN', 6],
+      ['SOCIAL WORKER', 7], ['INVESTMENT BANKER', 8], ['FITNESS COACH', 9],
+      ['NURSE PRACTITIONER', 2], ['LAB TECHNICIAN', 2], ['FARM WORKER', 3], ['MECHANIC', 4],
+      ['TEACHER', 5], ['EARLY CHILDHOOD EDUCATOR', 5], ['TRANSLATOR', 0], ['ACCOUNTANT', 8],
+      ['SOFTWARE DEVELOPER', 1], ['CAREGIVER', 7],
+      ['PLUMBER', -1], ['NUCLEAR ENGINEER', -1], ['CHEF', -1], ['TRUCK DRIVER', -1],
+      ['WELDER', -1], ['PHARMACIST', -1], ['CARPENTER', -1], ['HAIRSTYLIST', -1],
+      ['ELECTRICIAN', -1], ['DENTAL ASSISTANT', -1], ['BAKER', -1], ['CIVIL ENGINEER', -1],
+      ['ARCHITECT', -1], ['TAILOR', -1]
+    ];
+    return { envs, occ };
+  }
+
+  shuffle(a) {
+    const b = a.slice();
+    for (let i = b.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = b[i]; b[i] = b[j]; b[j] = t;
+    }
+    return b;
+  }
+
+  tone(h) {
+    const sh = Math.round((h + 140) / 2);
+    return 'radial-gradient(120% 95% at 28% 18%, oklch(0.72 0.055 ' + h + ') 0%, oklch(0.6 0.065 ' + h + ') 55%, oklch(0.46 0.055 ' + sh + ') 100%)';
+  }
+
+  /* ---------- flipbook ---------- */
+
+  pushLayer(i) {
+    const r = (a, b) => a + Math.random() * (b - a);
+    this.hist.push({ i, rot: Math.round(r(-3, 3) * 10) / 10, dx: Math.round(r(-8, 8)), dy: Math.round(r(-6, 6)) });
+    if (this.hist.length > 4) this.hist.shift();
+    this.setState((s) => ({ tick: s.tick + 1 }));
+  }
+
+  flipStep() {
+    if (this.state.paused || this.reduced) return;
+    const now = performance.now();
+    // Hard cap: never more than one new photo per 200ms (5 per second).
+    if (now - (this.lastPush || 0) < 195) return;
+    if (this.pendingHold != null) {
+      const i = this.pendingHold;
+      this.pendingHold = null;
+      const top = this.hist[this.hist.length - 1];
+      if (!top || top.i !== i) { this.pushLayer(i); this.lastPush = now; }
+      this.holdUntil = now + 1500;
+      return;
+    }
+    if (now < this.holdUntil) return;
+    this.pos = (this.pos + 1) % this.order.length;
+    this.pushLayer(this.order[this.pos]);
+    this.lastPush = now;
+  }
+
+  holdEnv(i) {
+    if (i == null || i < 0 || this.reduced || this.state.paused) return;
+    this.pendingHold = i;
+  }
+
+  applyMotion(red) {
+    this.reduced = red;
+    clearInterval(this.flipTimer);
+    clearInterval(this.autoTimer);
+    this.flipTimer = null;
+    this.autoTimer = null;
+    if (red) {
+      const top = this.hist[this.hist.length - 1] || { i: 3 };
+      this.hist = [{ i: top.i, rot: 0, dx: 0, dy: 0 }];
+      this.pendingHold = null;
+      this.demoMs = this.demoTimes().expandAt + 50;
+      this.demoPlaying = false;
+      for (const k in this.rv) this.rv[k] = 'r-on';
+      this.words = this.words.filter((w) => w.phase === 'on');
+    } else {
+      this.flipTimer = setInterval(() => this.flipStep(), 200);
+      if (this.touch) this.autoTimer = setInterval(() => this.autoReveal(), 2500);
+    }
+    this.dirty = true;
+    this.setState((s) => ({ tick: s.tick + 1 }));
+  }
+
+  drawGrain() {
+    const c = this.grainEl;
+    if (!c || !c.getContext) return;
+    const ctx = c.getContext('2d');
+    const img = ctx.createImageData(c.width, c.height);
+    for (let p = 0; p < img.data.length; p += 4) {
+      const v = 90 + Math.random() * 120;
+      img.data[p] = v; img.data[p + 1] = v; img.data[p + 2] = v;
+      img.data[p + 3] = 70;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  /* ---------- ascii field ---------- */
+
+  rel(el, pad) {
+    if (!el || !this.heroEl) return null;
+    let x = 0, y = 0, e = el;
+    while (e && e !== this.heroEl) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; }
+    return { x0: x - pad, y0: y - pad, x1: x + el.offsetWidth + pad, y1: y + el.offsetHeight + pad };
+  }
+
+  build() {
+    const hero = this.heroEl, cv = this.cvEl;
+    if (!hero || !cv || !cv.getContext) return;
+    const W = hero.offsetWidth, H = hero.offsetHeight;
+    if (!W || !H) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const fs = W < 700 ? 12 : 13;
+    ctx.font = '500 ' + fs + 'px "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const cw = ctx.measureText('D').width || fs * 0.6;
+    const chh = Math.round(fs * 1.25);
+    const cols = Math.ceil(W / cw), rows = Math.ceil(H / chh), N = cols * rows;
+
+    const F = this.rel(this.flipEl, 0) || { x0: W * 0.3, y0: H * 0.1, x1: W * 0.7, y1: H * 0.9 };
+    const masks = [this.rel(this.copyEl, 18), this.rel(this.brandEl, 10), this.rel(this.linksEl, 10)].filter(Boolean);
+    const fw = F.x1 - F.x0, fh = F.y1 - F.y0;
+    const fcx = (F.x0 + F.x1) / 2, fcy = (F.y0 + F.y1) / 2;
+
+    const balls = [
+      { x: F.x0 - 10, y: F.y1 - fh * 0.12, r: fw * 0.22 },
+      { x: F.x1 + 10, y: F.y1 - fh * 0.15, r: fw * 0.25 },
+      { x: F.x0 - 30, y: F.y0 + fh * 0.45, r: fw * 0.13 },
+      { x: F.x1 + 40, y: F.y0 + fh * 0.42, r: fw * 0.15 },
+      { x: fcx, y: F.y1 + 20, r: fw * 0.3 }
+    ];
+    const segs = [];
+    const path = (pts, t0, t1) => {
+      for (let k = 0; k < pts.length - 1; k++) {
+        const a = k / (pts.length - 1), b = (k + 1) / (pts.length - 1);
+        segs.push({ ax: pts[k][0], ay: pts[k][1], bx: pts[k + 1][0], by: pts[k + 1][1], ta: t0 + (t1 - t0) * a, tb: t0 + (t1 - t0) * b });
+      }
+    };
+    path([[F.x1 + 40, F.y0 + fh * 0.42], [F.x1 + fw * 0.35, F.y0 + fh * 0.25], [F.x1 + fw * 0.6, F.y0 + fh * 0.12], [W + 30, F.y0 + fh * 0.05]], 28, 13);
+    path([[F.x1 + fw * 0.2, F.y1 - fh * 0.1], [F.x1 + fw * 0.55, F.y0 + fh * 0.58], [W + 30, F.y0 + fh * 0.5]], 32, 15);
+    path([[F.x1 + fw * 0.35, F.y0 + fh * 0.25], [F.x1 + fw * 0.5, F.y0 - fh * 0.02]], 17, 11);
+    path([[F.x0 - 30, F.y0 + fh * 0.45], [F.x0 - fw * 0.3, F.y0 + fh * 0.3], [F.x0 - fw * 0.55, F.y0 + fh * 0.32], [-30, F.y0 + fh * 0.18]], 26, 12);
+    path([[F.x0 - fw * 0.3, F.y0 + fh * 0.3], [F.x0 - fw * 0.45, F.y0 + fh * 0.04]], 17, 11);
+    path([[F.x0 - 10, F.y1 - fh * 0.12], [F.x0 - fw * 0.45, F.y1 - fh * 0.02], [-30, F.y1 + fh * 0.04]], 24, 13);
+
+    const fieldAt = (x, y) => {
+      let s = 0;
+      for (let k = 0; k < balls.length; k++) {
+        const b = balls[k], dx = x - b.x, dy = y - b.y;
+        s += (b.r * b.r) / (dx * dx + dy * dy + 1);
+      }
+      for (let k = 0; k < segs.length; k++) {
+        const g = segs[k];
+        const vx = g.bx - g.ax, vy = g.by - g.ay;
+        let u = ((x - g.ax) * vx + (y - g.ay) * vy) / (vx * vx + vy * vy || 1);
+        u = u < 0 ? 0 : u > 1 ? 1 : u;
+        const px = g.ax + vx * u - x, py = g.ay + vy * u - y;
+        const th = g.ta + (g.tb - g.ta) * u;
+        const v = (th * th) / (px * px + py * py + 1);
+        if (v > s) s = v;
+      }
+      const yb = H * 0.86 + 22 * Math.sin(x / 130) + 12 * Math.sin(x / 47 + 1.3);
+      const soil = y > yb ? 1.3 : 1 / (1 + Math.pow((yb - y) / 30, 2));
+      if (soil > s) s = soil;
+      if (Math.sin(x / 230 + 0.4) > -0.3) {
+        const ys = H * 0.7 + 26 * Math.sin(x / 170 + 0.7) + 10 * Math.sin(x / 61);
+        const th = 22 + 10 * Math.sin(x / 90 + 2);
+        const d = y - ys;
+        const v = (th * th) / (d * d + 1);
+        if (v > s) s = v;
+      }
+      return s;
+    };
+
+    const maskAt = (x, y) => {
+      let m = 1;
+      for (let k = 0; k < masks.length; k++) {
+        const r = masks[k];
+        const dx = Math.max(r.x0 - x, 0, x - r.x1), dy = Math.max(r.y0 - y, 0, y - r.y1);
+        const d = Math.sqrt(dx * dx + dy * dy);
+        const v = Math.min(1, d / 36);
+        if (v < m) m = v;
+      }
+      return m;
+    };
+
+    const S = new Float32Array(N), K = new Uint8Array(N), M = new Float32Array(N);
+    const A = new Float32Array(N), E = new Uint8Array(N), P = new Float32Array(N);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c, x = (c + 0.5) * cw, y = (r + 0.5) * chh;
+        S[i] = fieldAt(x, y);
+        M[i] = maskAt(x, y);
+        P[i] = Math.random();
+        E[i] = Math.floor(Math.random() * 3);
+        const inFlip = x > F.x0 - 6 && x < F.x1 + 6 && y > F.y0 - 6 && y < F.y1 + 6;
+        K[i] = inFlip ? 0 : S[i] >= 1 ? 2 : 1;
+      }
+    }
+    const massCells = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c;
+        if (K[i] === 2) {
+          let edge = false;
+          for (let dr = -1; dr <= 1 && !edge; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              const rr = r + dr, cc = c + dc;
+              if (rr < 0 || cc < 0 || rr >= rows || cc >= cols) continue;
+              if (S[rr * cols + cc] < 1) { edge = true; break; }
+            }
+          }
+          if (edge) K[i] = 3;
+          else if (M[i] >= 0.999) massCells.push(i);
+        } else if (K[i] === 1) {
+          const x = (c + 0.5) * cw, y = (r + 0.5) * chh;
+          let tx = fcx - x, ty = fcy - y;
+          const tl = Math.sqrt(tx * tx + ty * ty) || 1;
+          tx /= tl; ty /= tl;
+          const gx = S[r * cols + Math.min(cols - 1, c + 1)] - S[r * cols + Math.max(0, c - 1)];
+          const gy = S[Math.min(rows - 1, r + 1) * cols + c] - S[Math.max(0, r - 1) * cols + c];
+          let nx = -gy, ny = gx;
+          const nl = Math.sqrt(nx * nx + ny * ny);
+          let dx = tx, dy = ty;
+          if (nl > 1e-6) {
+            nx /= nl; ny /= nl;
+            if (nx * tx + ny * ty < 0) { nx = -nx; ny = -ny; }
+            const s = S[i];
+            const w = s <= 0.3 ? 0 : s >= 1 ? 1 : (s - 0.3) / 0.7;
+            const ww = w * w * (3 - 2 * w);
+            dx = tx * (1 - ww) + nx * ww;
+            dy = ty * (1 - ww) + ny * ww;
+          }
+          A[i] = Math.atan2(dy, dx);
+        }
+      }
+    }
+    this.words = [];
+    this.G = { ctx, W, H, cw, ch: chh, cols, rows, N, K, M, A, E, P, massCells };
+    this.dirty = true;
+  }
+
+  pt(e) {
+    const hero = this.heroEl, G = this.G;
+    if (!hero || !G) return null;
+    const rect = hero.getBoundingClientRect();
+    if (!rect.width) return null;
+    const sc = G.W / rect.width;
+    return { x: (e.clientX - rect.left) * sc, y: (e.clientY - rect.top) * sc };
+  }
+
+  nearWord(w, p, R) {
+    const dx = Math.max(w.x0 - p.x, 0, p.x - w.x1);
+    const dy = Math.max(w.y0 - p.y, 0, p.y - w.y1);
+    return dx * dx + dy * dy < R * R;
+  }
+
+  occupied() {
+    const set = new Set();
+    for (const w of this.words) for (const i of w.cells) set.add(i);
+    return set;
+  }
+
+  isFree(r, c, occ) {
+    const G = this.G;
+    if (r < 0 || c < 0 || r >= G.rows || c >= G.cols) return false;
+    const i = r * G.cols + c;
+    return (G.K[i] === 2 || G.K[i] === 3) && G.M[i] >= 0.999 && !occ.has(i);
+  }
+
+  massNear(x, y, R) {
+    const G = this.G;
+    const c0 = Math.floor(x / G.cw), r0 = Math.floor(y / G.ch);
+    const occ = this.occupied();
+    let best = -1, bd = Infinity;
+    const rc = Math.ceil(R / G.cw), rr = Math.ceil(R / G.ch);
+    for (let r = r0 - rr; r <= r0 + rr; r++) {
+      for (let c = c0 - rc; c <= c0 + rc; c++) {
+        if (!this.isFree(r, c, occ)) continue;
+        const dx = (c + 0.5) * G.cw - x, dy = (r + 0.5) * G.ch - y;
+        const d = dx * dx + dy * dy;
+        if (d < bd && d <= R * R) { bd = d; best = r * G.cols + c; }
+      }
+    }
+    return best;
+  }
+
+  reveal(idx, p, now) {
+    const G = this.G, D = this.D;
+    const occ = this.occupied();
+    const showing = new Set(this.words.map((w) => w.text));
+    const r0 = Math.floor(idx / G.cols), c = idx % G.cols;
+    const tries = [0, 1, -1, 2, -2, 3, -3];
+    for (const dr of tries) {
+      const r = r0 + dr;
+      if (!this.isFree(r, c, occ)) continue;
+      let a = c, b = c;
+      while (this.isFree(r, a - 1, occ)) a--;
+      while (this.isFree(r, b + 1, occ)) b++;
+      const len = b - a + 1;
+      let pick = -1;
+      for (let q = 0; q < this.oq.length; q++) {
+        const o = D.occ[this.oq[q]];
+        if (o[0].length <= len && !showing.has(o[0])) { pick = q; break; }
+      }
+      if (pick < 0) continue;
+      const oi = this.oq.splice(pick, 1)[0];
+      this.oq.push(oi);
+      const text = D.occ[oi][0], env = D.occ[oi][1], L = text.length;
+      const start = Math.max(a, Math.min(c - Math.floor(L / 2), b - L + 1));
+      const cells = [];
+      for (let k = 0; k < L; k++) cells.push(r * G.cols + start + k);
+      const scr = new Set(cells);
+      const R = 80, rc = Math.ceil(R / G.cw), rr = Math.ceil(R / G.ch);
+      const pc = Math.floor(p.x / G.cw), pr = Math.floor(p.y / G.ch);
+      for (let y = pr - rr; y <= pr + rr; y++) {
+        for (let x = pc - rc; x <= pc + rc; x++) {
+          if (!this.isFree(y, x, occ)) continue;
+          const dx = (x + 0.5) * G.cw - p.x, dy = (y + 0.5) * G.ch - p.y;
+          if (dx * dx + dy * dy <= R * R) scr.add(y * G.cols + x);
+        }
+      }
+      const x0 = start * G.cw, x1 = (start + L) * G.cw, y0 = r * G.ch, y1 = (r + 1) * G.ch;
+      const instant = this.reduced;
+      this.words.push({
+        text, env, cells, scr: Array.from(scr),
+        phase: instant ? 'on' : 'in', ps: now,
+        revealAt: instant ? now : now + 300, lastNear: instant ? now : now + 300,
+        x0, x1, y0, y1, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2
+      });
+      this.dirty = true;
+      return true;
+    }
+    return false;
+  }
+
+  handleMove(e) {
+    if (!this.G) return;
+    if (e.pointerType === 'touch') return;
+    const p = this.pt(e);
+    if (!p) return;
+    this.mouse = p;
+    this.dirty = true;
+    const now = performance.now();
+    for (const w of this.words) if (w.phase !== 'out' && this.nearWord(w, p, 80)) w.lastNear = Math.max(w.lastNear, now);
+    if (now - this.lastTrig < 220) return;
+    if (this.words.some((w) => w.phase !== 'out' && this.nearWord(w, p, 130))) return;
+    if (this.words.filter((w) => w.phase !== 'out').length >= 4) return;
+    const hit = this.massNear(p.x, p.y, 14);
+    if (hit < 0) return;
+    if (this.reveal(hit, p, now)) this.lastTrig = now;
+  }
+
+  handleDown(e) {
+    if (!this.G || e.pointerType === 'mouse') return;
+    const p = this.pt(e);
+    if (!p) return;
+    const now = performance.now();
+    if (this.words.some((w) => w.phase !== 'out' && this.nearWord(w, p, 60))) return;
+    const hit = this.massNear(p.x, p.y, 140);
+    if (hit < 0) return;
+    const G = this.G;
+    const q = { x: ((hit % G.cols) + 0.5) * G.cw, y: (Math.floor(hit / G.cols) + 0.5) * G.ch };
+    this.reveal(hit, q, now);
+  }
+
+  autoReveal() {
+    const G = this.G;
+    if (!G || !G.massCells.length) return;
+    const now = performance.now();
+    for (let t = 0; t < 14; t++) {
+      const i = G.massCells[Math.floor(Math.random() * G.massCells.length)];
+      const p = { x: ((i % G.cols) + 0.5) * G.cw, y: (Math.floor(i / G.cols) + 0.5) * G.ch };
+      if (this.words.some((w) => w.phase !== 'out' && this.nearWord(w, p, 140))) continue;
+      if (this.reveal(i, p, now)) return;
+    }
+  }
+
+  updateWords(ts) {
+    let changed = false;
+    for (const w of this.words) {
+      if (w.phase === 'in' && ts - w.ps >= 300) {
+        w.phase = 'on'; w.ps = ts; w.lastNear = Math.max(w.lastNear, ts);
+        this.holdEnv(w.env);
+        changed = true;
+      } else if (w.phase === 'on' && ts - w.lastNear > 1500) {
+        w.phase = this.reduced ? 'gone' : 'out'; w.ps = ts;
+        changed = true;
+      } else if (w.phase === 'out' && ts - w.ps >= 300) {
+        w.phase = 'gone';
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.words = this.words.filter((w) => w.phase !== 'gone');
+      this.dirty = true;
+    }
+  }
+
+  glyph(i, ts) {
+    let h = (i * 374761393 + Math.floor(ts / 70) * 668265263) | 0;
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    h ^= h >>> 16;
+    return 'ABCDEFGHJKLMNOPQRSTUVWXYZ'[(h >>> 0) % 25];
+  }
+
+  frame(ts) {
+    this.raf = requestAnimationFrame(this.loop);
+    if (!this.G) return;
+    this.updateWords(ts);
+    if (this.reduced) {
+      if (!this.dirty) return;
+    } else if (ts - this.lastDraw < 33) {
+      return;
+    }
+    this.lastDraw = ts;
+    this.dirty = false;
+    this.draw(ts);
+  }
+
+  draw(ts) {
+    const G = this.G, ctx = G.ctx;
+    const t = this.reduced ? 0 : ts / 1000;
+    const { cols, rows, cw, K, M, A, E, P } = G;
+    const chh = G.ch;
+    ctx.clearRect(0, 0, G.W, G.H);
+
+    const ov = new Map();
+    for (const w of this.words) {
+      if (w.phase === 'in') {
+        for (const i of w.scr) ov.set(i, this.glyph(i, ts));
+      } else if (w.phase === 'on') {
+        for (let k = 0; k < w.cells.length; k++) ov.set(w.cells[k], w.text[k]);
+      } else if (w.phase === 'out') {
+        for (const i of w.cells) ov.set(i, this.glyph(i, ts));
+      }
+    }
+
+    const att = [];
+    for (const w of this.words) {
+      if (w.phase !== 'on') continue;
+      const age = ts - w.revealAt;
+      let k = age < 200 ? age / 200 : age < 1200 ? 1 : Math.max(0, 1 - (age - 1200) / 400);
+      if (this.reduced) k = 1;
+      if (k > 0) att.push({ x: w.cx, y: w.cy, k, R: 170 });
+    }
+
+    const ARR = ['→', '↓', '←', '↑'];
+    const HALF = Math.PI / 2;
+    ctx.fillStyle = 'rgb(143, 166, 142)';
+    for (let r = 0; r < rows; r++) {
+      const y = (r + 0.5) * chh;
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c;
+        if (K[i] !== 1 || M[i] <= 0.02) continue;
+        const x = (c + 0.5) * cw;
+        let a = A[i] + 0.85 * Math.sin(t * 0.55 - x * 0.009 - y * 0.004) + 0.35 * Math.sin(t * 0.3 + y * 0.011);
+        for (let q = 0; q < att.length; q++) {
+          const s = att[q], dx = s.x - x, dy = s.y - y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d > s.R) continue;
+          const wgt = Math.min(1, s.k * (1 - d / s.R) * 1.8);
+          const diff = Math.atan2(Math.sin(Math.atan2(dy, dx) - a), Math.cos(Math.atan2(dy, dx) - a));
+          a += diff * wgt;
+        }
+        const qi = ((Math.round(a / HALF) % 4) + 4) % 4;
+        ctx.globalAlpha = 0.3 * M[i];
+        ctx.fillText(ARR[qi], x, y);
+      }
+    }
+
+    ctx.fillStyle = 'rgb(239, 230, 210)';
+    const KTV = 'KTV';
+    for (let r = 0; r < rows; r++) {
+      const y = (r + 0.5) * chh;
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c;
+        const k = K[i];
+        if ((k !== 2 && k !== 3) || M[i] <= 0.02 || ov.has(i)) continue;
+        const x = (c + 0.5) * cw;
+        if (k === 2) {
+          ctx.globalAlpha = 0.35 * M[i];
+          ctx.fillText('D', x, y);
+        } else {
+          const fl = this.reduced ? 1 : 0.72 + 0.28 * Math.sin(t * 1.7 + P[i] * 6.283);
+          ctx.globalAlpha = 0.35 * M[i] * fl;
+          const ci = this.reduced ? E[i] : (E[i] + Math.floor(t * 0.6 + P[i] * 5)) % 3;
+          ctx.fillText(KTV[ci], x, y);
+        }
+      }
+    }
+
+    ov.forEach((chr, i) => {
+      if (chr === ' ') return;
+      const r = Math.floor(i / cols), c = i % cols;
+      const isWord = this.words.some((w) => w.phase === 'on' && w.cells.indexOf(i) >= 0);
+      ctx.globalAlpha = isWord ? 1 : 0.7;
+      ctx.fillText(chr, (c + 0.5) * cw, (r + 0.5) * chh);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  componentDidMount() {
+    const mq = (q) => (window.matchMedia ? window.matchMedia(q) : null);
+    const rm = mq('(prefers-reduced-motion: reduce)');
+    const hv = mq('(hover: none)');
+    this.touch = !!(hv && hv.matches);
+    this.applyMotion(!!(rm && rm.matches));
+    if (rm && rm.addEventListener) {
+      this.rmq = rm;
+      this.rmHandler = (e) => this.applyMotion(e.matches);
+      rm.addEventListener('change', this.rmHandler);
+    }
+    this.drawGrain();
+    const go = () => this.build();
+    go();
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load('500 13px "JetBrains Mono"').then(go, go);
+    }
+    if (window.ResizeObserver && this.heroEl) {
+      this.ro = new ResizeObserver(() => {
+        cancelAnimationFrame(this.roRaf);
+        this.roRaf = requestAnimationFrame(go);
+      });
+      this.ro.observe(this.heroEl);
+      if (this.flipEl) this.ro.observe(this.flipEl);
+      if (this.copyEl) this.ro.observe(this.copyEl);
+    }
+    this.raf = requestAnimationFrame(this.loop);
+
+    if (!this.reduced && window.IntersectionObserver) {
+      this.rio = new IntersectionObserver((es) => {
+        let ch = false;
+        for (const en of es) {
+          if (!en.isIntersecting) continue;
+          const k = en.target.getAttribute('data-rv');
+          if (k && this.rv[k] !== 'r-on') { this.rv[k] = 'r-on'; ch = true; }
+          this.rio.unobserve(en.target);
+        }
+        if (ch) this.setState((s) => ({ tick: s.tick + 1 }));
+      }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+      for (const k in this.secEls) if (this.secEls[k]) this.rio.observe(this.secEls[k]);
+    } else {
+      for (const k in this.rv) this.rv[k] = 'r-on';
+      this.setState((s) => ({ tick: s.tick + 1 }));
+    }
+    if (window.IntersectionObserver && this.demoEl) {
+      this.io = new IntersectionObserver((es) => {
+        for (const en of es) this.demoVisible = en.isIntersecting;
+      }, { threshold: 0.35 });
+      this.io.observe(this.demoEl);
+    } else {
+      this.demoVisible = true;
+    }
+    this.demoTimer = setInterval(() => this.demoTick(), 40);
+    this.demoSync(true);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.demoTimer);
+    if (this.io) this.io.disconnect();
+    if (this.rio) this.rio.disconnect();
+    if (this.rmq && this.rmHandler) this.rmq.removeEventListener('change', this.rmHandler);
+    clearInterval(this.flipTimer);
+    clearInterval(this.autoTimer);
+    cancelAnimationFrame(this.raf);
+    cancelAnimationFrame(this.roRaf);
+    if (this.ro) this.ro.disconnect();
+  }
+
+  renderVals() {
+    const D = this.D;
+    const n = this.hist.length;
+    const ops = n === 1 ? [1] : [0.2, 0.32, 0.5, 1].slice(4 - n);
+    const total = D.envs.length;
+    const layers = this.hist.map((h, k) => {
+      const e = D.envs[h.i];
+      const num = h.i + 1;
+      return {
+        transform: 'translate(' + h.dx + 'px, ' + h.dy + 'px) rotate(' + h.rot + 'deg)',
+        opacity: ops[k],
+        bg: this.tone(e.h),
+        isTop: k === n - 1,
+        hasImg: !!e.src,
+        src: e.src || '',
+        showLabel: k === n - 1 && !e.src,
+        name: e.name,
+        shot: e.shot,
+        num: 'PHOTO ' + (num < 10 ? '0' : '') + num + ' / ' + total
+      };
+    });
+    const paused = !!this.state.paused;
+    const dv = this.demoView(this.demoMs);
+    const ph = dv.phase;
+    const dCards = [
+      { noc: 'NOC 63200', name: 'Cook', why: 'Eight years of cooking for customers is cook experience.' },
+      { noc: 'NOC 62200', name: 'Chef', why: 'You ran the kitchen. That counts toward chef work.' },
+      { noc: 'NOC 62020', name: 'Food service supervisor', why: 'You trained new staff. That is supervisor work.' }
+    ].map((c, k) => Object.assign({ delay: (k * 260) + 'ms' }, c));
+    const dSteps = [
+      { title: 'Get a letter about your work.', text: 'Ask the restaurant to describe your duties and years. No letter? A settlement worker can help you write a statement.' },
+      { title: 'Take a food handler course.', text: 'A short course, often one day. Many cities offer it online.' },
+      { title: 'Apply to challenge the Red Seal Cook exam.', text: 'Experienced cooks can apply through their province’s apprenticeship office.' },
+      { title: 'Work as a cook while you prepare.', text: 'Your hours in Canada count toward your application.' }
+    ].map((s, k) => Object.assign({ n: k + 1, delay: (200 + k * 160) + 'ms' }, s));
+    return {
+      appUrl: this.props.appUrl ?? 'https://rooted2-0.vercel.app',
+      githubUrl: this.props.githubUrl ?? 'https://github.com/jamieleeserhuan/rooted2.0',
+      setDemo: this.setDemo,
+      setSec: this.setSec,
+      rv: this.rv,
+      toggleDemo: this.toggleDemo,
+      replayDemo: this.replayDemo,
+      dPlaying: this.demoPlaying,
+      dPaused: !this.demoPlaying,
+      demoPauseLabel: this.demoPlaying ? 'Pause demo' : 'Play demo',
+      dTyped: this.demoText.slice(0, dv.chars),
+      dShowInput: ph === 'type' || ph === 'press' || ph === 'load',
+      dCaret: ph === 'type',
+      dBtnLabel: ph === 'load' ? 'Finding where it fits…' : 'Find my pathway',
+      dBtnTransform: ph === 'press' ? 'scale(0.95)' : 'none',
+      dBtnBg: ph === 'press' ? '#BC9A5E' : '#C9A86A',
+      dShowCards: ph === 'cards',
+      dShowPath: ph === 'path',
+      dCards,
+      dSteps,
+      layers,
+      paused,
+      playing: !paused,
+      showPause: !this.reduced,
+      pauseLabel: paused ? 'Play photos' : 'Pause photos',
+      togglePause: this.togglePause,
+      setHero: this.setHero,
+      setCanvas: this.setCanvas,
+      setFlip: this.setFlip,
+      setCopy: this.setCopy,
+      setBrand: this.setBrand,
+      setLinks: this.setLinks,
+      setGrain: this.setGrain,
+      onMove: this.onMove,
+      onLeave: this.onLeave,
+      onDown: this.onDown
+    };
+  }
+}
+
+class Site extends Component {
+  mount() {
+    const ref = (n) => document.querySelector('[data-ref="' + n + '"]');
+    ['hero', 'canvas', 'flip', 'copy', 'brand', 'links', 'grain', 'demo'].forEach((n) => {
+      this['set' + n[0].toUpperCase() + n.slice(1)](ref(n));
+    });
+    document.querySelectorAll('[data-rv]').forEach((el) => this.setSec(el));
+    this.rvEls = Array.from(document.querySelectorAll('[data-rv]'));
+    this.layerEls = Array.from(document.querySelectorAll('[data-layer]'));
+    this.pauseBtn = ref('pause');
+    this.demoBtn = ref('demoToggle');
+    this.typedEl = ref('typed');
+    this.caretEl = ref('caret');
+    this.dbtn = ref('dbtn');
+    this.phaseEls = {};
+    document.querySelectorAll('[data-phase]').forEach((el) => { this.phaseEls[el.dataset.phase] = el; });
+
+    this.heroEl.addEventListener('mousemove', this.onMove);
+    this.heroEl.addEventListener('mouseleave', this.onLeave);
+    this.heroEl.addEventListener('pointerdown', this.onDown);
+    this.pauseBtn.addEventListener('click', this.togglePause);
+    this.demoBtn.addEventListener('click', this.toggleDemo);
+    ref('demoReplay').addEventListener('click', this.replayDemo);
+
+    this.D.envs.forEach((e) => { const i = new Image(); i.src = e.src; });
+    this.render();
+    this.componentDidMount();
+  }
+
+  icons(btn, paused) {
+    btn.querySelector('[data-icon="play"]').hidden = !paused;
+    btn.querySelector('[data-icon="pause"]').hidden = paused;
+  }
+
+  render() {
+    const v = this.renderVals();
+    const L = this.layerEls, n = v.layers.length;
+    L.forEach((el, k) => {
+      const ly = v.layers[k - (L.length - n)];
+      el.hidden = !ly;
+      if (!ly) return;
+      el.style.transform = ly.transform;
+      el.style.opacity = ly.opacity;
+      const img = el.firstElementChild;
+      if (img.getAttribute('src') !== ly.src) img.setAttribute('src', ly.src);
+    });
+    this.pauseBtn.hidden = !v.showPause;
+    this.pauseBtn.setAttribute('aria-label', v.pauseLabel);
+    this.pauseBtn.setAttribute('aria-pressed', String(v.paused));
+    this.icons(this.pauseBtn, v.paused);
+
+    this.demoBtn.setAttribute('aria-label', v.demoPauseLabel);
+    this.demoBtn.setAttribute('aria-pressed', String(v.dPaused));
+    this.icons(this.demoBtn, v.dPaused);
+    this.phaseEls.input.hidden = !v.dShowInput;
+    this.phaseEls.cards.hidden = !v.dShowCards;
+    this.phaseEls.path.hidden = !v.dShowPath;
+    if (this.typedEl.textContent !== v.dTyped) this.typedEl.textContent = v.dTyped;
+    this.caretEl.hidden = !v.dCaret;
+    this.dbtn.textContent = v.dBtnLabel;
+    this.dbtn.style.transform = v.dBtnTransform;
+    this.dbtn.style.background = v.dBtnBg;
+
+    this.rvEls.forEach((el) => el.classList.toggle('r-on', v.rv[el.dataset.rv] === 'r-on'));
+  }
+}
+
+const site = new Site({});
+site.mount();
+if (/[?&]debug\b/.test(location.search)) window.rooted = site;
+</script>
+</body>
+</html>
