@@ -1,64 +1,58 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
+
+/* Same palette and type as the Rooted website. */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Lora", Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --color-brand-green: #233e00;
-  --color-brand-green-hover: #192d00;
-  --color-brand-dark: #2A2A28;
-  --color-brand-text: #343432;
-  --color-brand-secondary: #5F5F5C;
-  --color-brand-gold: #A08E79;
-  --color-brand-cream: #E9E5DE;
-  --color-brand-sand: #F1EDEA;
-  --color-brand-soft-bg: #FBF9F6;
+  --font-sans: "Inter", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-forest: #1F3A2B;      /* dominant green */
+  --color-forest-deep: #142A1E; /* deeper shade, body text on cream */
+  --color-cream: #EFE6D2;       /* beige */
+  --color-cream-light: #F7F1E3; /* lighter beige, page ground */
+  --color-paper: #FBF7EE;       /* cards and inputs */
+  --color-line: #C9BFA6;        /* borders on cream */
+  --color-sage: #8FA68E;        /* secondary text on green, borders, arrows */
+  --color-sage-dark: #4A6352;   /* secondary text on cream (passes AA) */
+  --color-gold: #C9A86A;        /* the main action on each screen */
+  --color-gold-dark: #BC9A5E;
 }
-body {
-  background-color: #F7F5F0;
-  color: #343432;
-  font-family: var(--font-sans);
+
+html { -webkit-text-size-adjust: 100%; }
+@layer base {
+  body {
+    margin: 0;
+    background-color: #F7F1E3;
+    color: #142A1E;
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3 { font-family: var(--font-serif); }
 }
-h1, h2, h3, .font-serif-display {
-  font-family: var(--font-serif);
+::selection { background: #C9A86A; color: #142A1E; }
+
+/* Focus: forest ring on light screens, gold ring on green ones. */
+:focus-visible { outline: 2px solid #1F3A2B; outline-offset: 3px; }
+.on-forest :focus-visible { outline-color: #C9A86A; }
+
+/* Native disclosure marker off; we draw our own. */
+summary { list-style: none; }
+summary::-webkit-details-marker { display: none; }
+
+@keyframes rooted-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes rooted-loading-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(350%); } }
+@keyframes rooted-fade { from { opacity: 0; } to { opacity: 1; } }
+.rooted-in { animation: rooted-in 480ms cubic-bezier(.2,.7,.2,1) both; }
+.rooted-loading-bar { animation: rooted-loading-slide 1.6s ease-in-out infinite; }
+.rooted-fade { animation: rooted-fade 600ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .rooted-in, .rooted-fade { animation: none; }
+  .rooted-loading-bar { animation-duration: 4s; }
 }
-/* Accessibility font size scaling
-   Scales text inside the main content area only (not the header A/A/A controls).
-   Uses !important to beat Tailwind's responsive text-size classes (e.g. md:text-5xl).
-   Page layout stays put; only the text grows. */
-/* Large */
-[data-fontsize="large"] main h1 { font-size: 3.4rem !important; }
-[data-fontsize="large"] main h2 { font-size: 2rem !important; }
-[data-fontsize="large"] main h3 { font-size: 1.4rem !important; }
-[data-fontsize="large"] main h4,
-[data-fontsize="large"] main h5 { font-size: 0.95rem !important; }
-[data-fontsize="large"] main p,
-[data-fontsize="large"] main h1 + p { font-size: 1.7rem !important; }
-[data-fontsize="large"] main span,
-[data-fontsize="large"] main a,
-[data-fontsize="large"] main li,
-[data-fontsize="large"] main label,
-[data-fontsize="large"] main select,
-[data-fontsize="large"] main input,
-[data-fontsize="large"] main textarea,
-[data-fontsize="large"] main button {
-  font-size: 1.15rem !important;
-}
-/* Extra large */
-[data-fontsize="xlarge"] main h1 { font-size: 3.9rem !important; }
-[data-fontsize="xlarge"] main h2 { font-size: 2.4rem !important; }
-[data-fontsize="xlarge"] main h3 { font-size: 1.6rem !important; }
-[data-fontsize="xlarge"] main h4,
-[data-fontsize="xlarge"] main h5 { font-size: 1.05rem !important; }
-[data-fontsize="xlarge"] main p,
-[data-fontsize="xlarge"] main h1 + p { font-size: 2rem !important; }
-[data-fontsize="xlarge"] main span,
-[data-fontsize="xlarge"] main a,
-[data-fontsize="xlarge"] main li,
-[data-fontsize="xlarge"] main label,
-[data-fontsize="xlarge"] main select,
-[data-fontsize="xlarge"] main input,
-[data-fontsize="xlarge"] main textarea,
-[data-fontsize="xlarge"] main button {
-  font-size: 1.3rem !important;
-}
+
+/* Accessibility text size (the A A A control in the header).
+   All page text is sized in rem, so changing the root size scales every
+   heading, label and paragraph together and keeps their proportions.
+   The header itself uses fixed sizes so it stays compact. */
+html[data-fontsize="large"] { font-size: 118.75%; }   /* 19px body base */
+html[data-fontsize="xlarge"] { font-size: 137.5%; }   /* 22px body base */

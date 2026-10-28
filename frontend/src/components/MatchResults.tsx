@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ArrowLeft, Tag, BarChart3, HelpCircle, Check, Briefcase, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Language, NocMatch } from '../types';
 import { translations } from '../data/translations';
+import { ScreenHeader, Eyebrow, btnForest, linkUnderline } from './ui';
 
 interface MatchResultsProps {
   currentLanguage: Language;
@@ -18,119 +19,53 @@ interface MatchResultsProps {
 export default function MatchResults({ currentLanguage, matches, onBack, onSelectMatch, isSandboxMode }: MatchResultsProps) {
   const t = translations[currentLanguage];
 
-  // Map categories to beautiful styles and icons
-  const getCategoryStyles = (category: string) => {
-    const norm = (category || '').toLowerCase();
-    if (norm.includes('health')) return { bg: 'bg-[#EAF3EE] text-[#3B6651] border-[#C2DEC3]/40', dot: 'bg-[#233e00]' };
-    if (norm.includes('engineer')) return { bg: 'bg-[#E8F1F5] text-[#34627C] border-[#CCE2F0]/40', dot: 'bg-sky-500' };
-    if (norm.includes('educat')) return { bg: 'bg-[#FAF4EB] text-[#865E26] border-[#F3E2C9]/40', dot: 'bg-amber-500' };
-    if (norm.includes('law')) return { bg: 'bg-[#F3EFF9] text-[#5A3886] border-[#DDD1ED]/40', dot: 'bg-purple-500' };
-    if (norm.includes('trade')) return { bg: 'bg-[#FBF1EA] text-[#8D4D20] border-[#F3DCB7]/40', dot: 'bg-orange-500' };
-    return { bg: 'bg-[#F7F5F0] text-[#2A2A28] border-[#E9E5DE]', dot: 'bg-[#A08E79]' };
-  };
-
   return (
-    <div className="w-full max-w-2xl bg-white border border-[#E9E5DE] rounded-[40px] p-6 md:p-10 shadow-[0_32px_64px_-16px_rgba(90,125,108,0.1)] mx-auto">
-      {/* Header with Back button */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={onBack}
-          className="p-2 hover:bg-[#F7F5F0] rounded-xl transition text-[#2A2A28] cursor-pointer"
-          title={t.backButton}
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <h2 className="text-xl md:text-2xl font-bold font-serif text-[#2A2A28] tracking-tight">
-          {t.resultsTitle}
-        </h2>
-      </div>
-
+    <div className="mx-auto w-full max-w-[880px] px-5 sm:px-8 py-10 sm:py-14 rooted-in">
+      <ScreenHeader title={t.resultsTitle} onBack={onBack} backLabel={t.backButton} />
 
       {isSandboxMode && (
-        <div className="mb-8 p-5 bg-[#FAF4EB] border border-[#F3E2C9]/60 rounded-2xl text-left flex gap-4 items-start shadow-xs">
-          <Sparkles className="w-5.5 h-5.5 text-[#2A2A28] shrink-0 mt-0.5" />
-          <div className="space-y-1.5 select-none">
-            <h4 className="text-xs font-bold text-[#865E26] uppercase tracking-wider">Simulated Sandbox Active</h4>
-            <p className="text-[#2A2A28] text-xs leading-relaxed font-semibold">
-              Because no <code className="bg-white px-1.5 py-0.5 rounded text-[10px] font-mono font-bold text-[#865E26] border border-[#F3E2C9]/40">GEMINI_API_KEY</code> has been set up in Settings, Rooted is running in simulated sandbox mode. Tracing completed with our local semantic matcher and mock pathways. To unlock dynamic translation & custom drafting, configure your API secret.
-            </p>
-          </div>
+        <div className="mt-8 rounded-xl bg-cream px-4 py-4 flex flex-col gap-1.5 text-start">
+          <Eyebrow>Simulated Sandbox Active</Eyebrow>
+          <p className="m-0 text-[0.875rem] leading-[1.55] text-forest-deep">
+            Because no <code className="font-mono text-[0.8125rem] px-1 rounded bg-paper border border-line">GEMINI_API_KEY</code> has been set up in Settings, Rooted is running in simulated sandbox mode. Tracing completed with our local semantic matcher and mock pathways. To unlock dynamic translation & custom drafting, configure your API secret.
+          </p>
         </div>
       )}
 
-      {/* Matches List */}
-      <div className="space-y-4 text-left">
-        {matches.map((match, idx) => {
-          const catStyle = getCategoryStyles(match.category);
-          return (
-            <div
-              key={idx}
-              className="group border border-[#E9E5DE] hover:border-[#233e00]/50 bg-white hover:bg-[#FBF9F6]/40 rounded-3xl p-5 md:p-6 transition-all duration-200 shadow-xs relative flex flex-col justify-between focus-within:ring-1 focus-within:ring-[#233e00]/50"
-            >
-              {/* Category tag */}
-              <div className="flex justify-between items-start gap-4 mb-3">
-                <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${catStyle.bg} flex items-center gap-1.5`}>
-                  <span className={`w-2 h-2 rounded-full ${catStyle.dot}`} />
-                  {match.category}
-                </span>
-                
-                {/* Match quality label */}
-                <div className="flex items-center gap-2 text-xs font-bold text-[#343432]">
-                  <BarChart3 className="w-4 h-4 text-[#233e00]" />
-                  <span>{match.matchLabel}</span>
-                  </div>
-              </div>
-
-              {/* Title & NOC Code */}
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Briefcase className="w-4 h-4 text-[#233e00]" />
-                  <h3 className="text-lg font-bold font-serif text-[#2A2A28] group-hover:text-[#233e00] leading-snug transition-colors">
-                    {match.title}
-                  </h3>
-                </div>
-                <div className="flex items-center gap-1.5 text-xs text-[#2A2A28] font-bold tracking-widest uppercase">
-                  <Tag className="w-3.5 h-3.5" />
-                  <span>NOC CODE {match.nocCode}</span>
-                </div>
-              </div>
-
-              {/* Description */}
-              <p className="text-[#2A2A28] text-sm leading-relaxed mb-6">
-                {match.description}
-              </p>
-
-              {/* Confidence Progress Slider (Text + Visual requirement) */}
-              <div className="w-full mb-6">
-                <div className="w-full bg-[#F1EDEA] rounded-full h-2">
-                  <div 
-                    className="bg-[#233e00] h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${match.confidence}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <button
-                onClick={() => onSelectMatch(match)}
-                className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-[#233e00] hover:bg-[#192d00] text-white font-bold rounded-[18px] text-sm transition min-h-[44px] cursor-pointer"
-              >
-                <Check className="w-4 h-4 shrink-0" />
-                <span>{t.selectMatchCTA}</span>
-              </button>
+      {/* Matches */}
+      <ol className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0 m-0 text-start">
+        {matches.map((match, idx) => (
+          <li
+            key={idx}
+            className="flex flex-col gap-3 rounded-2xl border-[1.5px] border-line bg-paper p-6 rooted-in"
+            style={{ animationDelay: `${idx * 70}ms` }}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+              <Eyebrow><bdi>NOC CODE {match.nocCode}</bdi></Eyebrow>
+              <span dir="auto" className="text-[0.8125rem] font-medium text-forest">{match.matchLabel}</span>
             </div>
-          );
-        })}
-      </div>
 
-      {/* Escape Hatch at bottom */}
-      <div className="mt-8 border-t border-[#F1EDEA] pt-6 text-center">
-        <button
-          onClick={onBack}
-          className="text-[#2A2A28] hover:text-[#233e00] hover:underline text-sm font-bold inline-flex items-center gap-1.5 transition cursor-pointer"
-        >
-          <HelpCircle className="w-4 h-4" />
-          <span>{t.escapeHatch}</span>
+            <h2 dir="auto" className="m-0 text-[1.5rem] leading-[1.15] font-semibold text-forest">{match.title}</h2>
+            {match.category && <span className="text-[0.8125rem] text-sage-dark">{match.category}</span>}
+
+            <p dir="auto" className="m-0 text-[0.9375rem] leading-[1.55] text-forest-deep">{match.description}</p>
+
+            <div className="h-1 w-full rounded-full bg-cream overflow-hidden" aria-hidden="true">
+              <div className="h-full rounded-full bg-forest" style={{ width: `${match.confidence}%` }} />
+            </div>
+
+            <button type="button" onClick={() => onSelectMatch(match)} className={`${btnForest} mt-auto w-full`}>
+              {t.selectMatchCTA}
+              <ArrowRight aria-hidden="true" className="w-4 h-4 rtl:-scale-x-100" />
+            </button>
+          </li>
+        ))}
+      </ol>
+
+      {/* Escape hatch */}
+      <div className="mt-10 text-center">
+        <button type="button" onClick={onBack} className={`min-h-[48px] text-[0.9375rem] font-medium text-forest ${linkUnderline}`}>
+          {t.escapeHatch}
         </button>
       </div>
     </div>

@@ -4,16 +4,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, Calendar, Coins, AlertCircle, ExternalLink, 
-  ShieldAlert, Heart, Users,
-  Loader2, Download
-} from 'lucide-react';
+import { AlertCircle, ExternalLink, Loader2, Download } from 'lucide-react';
 import { Language, NocMatch, PathwayCard, UserInput } from '../types';
 import { translations } from '../data/translations';
 import { getPathwayWithFallback } from '../data/curatedPathways';
 import { fetchPathway } from '../api/pathway';
 import { callSpace } from '../api/space';
+import { ScreenHeader, Eyebrow, btnGold, btnForest, btnQuiet, fieldBase } from './ui';
 
 interface PathwayScreenProps {
   currentLanguage: Language;
@@ -24,21 +21,6 @@ interface PathwayScreenProps {
   onReset: () => void;
   onFindSupport: () => void;
 }
-
-// ---------------------------------------------------------------------------
-// Placeholder content for sections not yet covered by the LLM-generated
-// pathway card. Clearly marked as sample data — replace with real
-// per-province research when available.
-// ---------------------------------------------------------------------------
-
-const PLACEHOLDER_FUNDING =
-  "Sample data: Newcomer loan programs and provincial bridging bursaries may help cover assessment, exam, and training costs. [Placeholder — replace with verified provincial funding info]";
-
-const PLACEHOLDER_CHILDCARE =
-  "Sample data: Many provinces offer child care subsidies for newcomers completing credential assessments or bridging programs. Check with your local settlement agency. [Placeholder — replace with verified provincial childcare support info]";
-
-const PLACEHOLDER_NAME_DISCREPANCY =
-  "Sample data: Provincial regulatory bodies generally accept a statutory declaration to address name discrepancies for trans and non-binary applicants. [Placeholder — replace with regulator-specific guidance]";
 
 // ---------------------------------------------------------------------------
 // Display types — only the fields PathwayScreen actually renders
@@ -62,9 +44,16 @@ interface DisplayPathway {
   typicalCost: string;
   fundingOptions: string[];
   steps: DisplayStep[];
-  childcareSupport: string;
-  nameDiscrepancyGuide?: string;
 }
+
+// Step tags are stored in English (they also go into the PDF, which the
+// backend translates). On screen they are shown in the chosen language.
+const STATUS_TRANSLATION_KEYS: Record<string, string> = {
+  'Credential assessment': 'statusAssessment',
+  'Alternative path for missing documents': 'statusNoDocs',
+  'Language requirement': 'statusLanguage',
+  'Fee required': 'statusFee',
+};
 
 const FLAG_STATUS_MAP: Record<string, { status: StepStatus; statusText: string }> = {
   assessment: { status: 'info', statusText: 'Credential assessment' },
@@ -73,11 +62,7 @@ const FLAG_STATUS_MAP: Record<string, { status: StepStatus; statusText: string }
   fee: { status: 'pending', statusText: 'Fee required' },
 };
 
-function mapPathwayCardToDisplay(
-  card: PathwayCard,
-  fallbackProvince: string,
-  isTransOrGenderDiverse: boolean
-): DisplayPathway {
+function mapPathwayCardToDisplay(card: PathwayCard, fallbackProvince: string): DisplayPathway {
   const timeRange =
     card.estimated_time_months_min === card.estimated_time_months_max
       ? `${card.estimated_time_months_min} months`
@@ -92,7 +77,8 @@ function mapPathwayCardToDisplay(
     province: card.province || fallbackProvince,
     typicalTime: timeRange,
     typicalCost: costText,
-    fundingOptions: [card.funding_note || PLACEHOLDER_FUNDING],
+    // No funding note from the backend means no funding box (never sample text).
+    fundingOptions: card.funding_note ? [card.funding_note] : [],
     steps: card.steps.map((step) => {
       const flagInfo = step.flag
         ? FLAG_STATUS_MAP[step.flag] || { status: 'info' as StepStatus, statusText: 'Step' }
@@ -105,8 +91,6 @@ function mapPathwayCardToDisplay(
         statusText: flagInfo.statusText,
       };
     }),
-    childcareSupport: PLACEHOLDER_CHILDCARE,
-    nameDiscrepancyGuide: isTransOrGenderDiverse ? PLACEHOLDER_NAME_DISCREPANCY : undefined,
   };
 }
 
@@ -125,8 +109,6 @@ function mapFallbackToDisplay(fallback: ReturnType<typeof getPathwayWithFallback
       actionLabel: s.actionLabel,
       actionUrl: s.actionUrl,
     })),
-    childcareSupport: fallback.childcareSupport,
-    nameDiscrepancyGuide: fallback.nameDiscrepancyGuide,
   };
 }
 
@@ -158,22 +140,17 @@ function buildPathwayText(pathway: DisplayPathway, occupationTitle: string, nocC
   lines.push(`Estimated time: ${pathway.typicalTime}`);
   lines.push(`Typical cost: ${pathway.typicalCost}`);
   lines.push('');
-  lines.push('Funding options:');
-  pathway.fundingOptions.forEach((opt) => lines.push(`- ${opt}`));
-  lines.push('');
+  if (pathway.fundingOptions.length) {
+    lines.push('Funding options:');
+    pathway.fundingOptions.forEach((opt) => lines.push(`- ${opt}`));
+    lines.push('');
+  }
   lines.push('Step-by-step pathway:');
   pathway.steps.forEach((step) => {
     lines.push(`Step ${step.id}: ${step.title} (${step.statusText})`);
     lines.push(step.description);
     lines.push('');
   });
-  lines.push('Childcare support:');
-  lines.push(pathway.childcareSupport);
-  if (pathway.nameDiscrepancyGuide) {
-    lines.push('');
-    lines.push('Name discrepancy guidance:');
-    lines.push(pathway.nameDiscrepancyGuide);
-  }
   return lines.join('\n');
 }
 
@@ -193,7 +170,7 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
       fetchPathway(match, userInput.province, userInput.documentsAvailable)
       .then((card) => {
         if (!isMounted) return;
-        setPathway(mapPathwayCardToDisplay(card, userInput.province, userInput.isTransOrGenderDiverse));
+        setPathway(mapPathwayCardToDisplay(card, userInput.province));
       })
       .catch((err) => {
         console.error('fetchPathway failed, using fallback data:', err);
@@ -246,16 +223,10 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err: any) {
-      setExportError(err.message || 'Could not export PDF.');
+      setExportError(err.message || t.exportError);
     } finally {
       setIsExporting(false);
     }
-  };
-
-  const statusColors = {
-    ready: { text: 'text-[#3B6651] bg-[#EAF3EE] border-[#C2DEC3]/40', dot: 'bg-[#233e00]' },
-    pending: { text: 'text-[#865E26] bg-[#FAF4EB] border-[#F3E2C9]/40', dot: 'bg-[#A08E79]' },
-    info: { text: 'text-[#34627C] bg-[#E8F1F5] border-[#CCE2F0]/40', dot: 'bg-sky-500' }
   };
 
   // ---------------------------------------------------------------------------
@@ -263,230 +234,163 @@ export default function PathwayScreen({ currentLanguage, match, userInput, detec
   // ---------------------------------------------------------------------------
   if (isLoadingPathway || !pathway) {
     return (
-      <div className="w-full max-w-3xl bg-white border border-[#E9E5DE] rounded-[40px] p-10 shadow-[0_32px_64px_-16px_rgba(90,125,108,0.1)] mx-auto flex flex-col items-center justify-center gap-4 min-h-[300px]">
-        <Loader2 className="w-8 h-8 text-[#233e00] animate-spin" />
-        <p className="text-[#2A2A28] text-sm font-semibold">Generating your pathway...</p>
+      <div className="mx-auto w-full max-w-[720px] px-5 py-24 flex flex-col items-center gap-4 text-center" role="status" aria-live="polite">
+        <Loader2 aria-hidden="true" className="w-7 h-7 text-forest animate-spin" />
+        <p className="m-0 text-[1rem] font-medium text-forest">{t.generatingPathway}</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-3xl bg-white border border-[#E9E5DE] rounded-[40px] p-5 md:p-10 shadow-[0_32px_64px_-16px_rgba(90,125,108,0.1)] mx-auto space-y-8">
-      {/* Header with back */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#F1EDEA] pb-6 text-left">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-2 hover:bg-[#F7F5F0] rounded-xl transition text-[#2A2A28] cursor-pointer"
-            title={t.backButton}
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h2 className="text-xl md:text-2xl font-bold font-serif text-[#2A2A28] tracking-tight leading-tight">
-              {match.title}
-            </h2>
-            <p className="text-xs font-bold text-[#2A2A28] uppercase tracking-widest block mt-1.5">
-              {pathway.province} — NOC {match.nocCode}
-            </p>
-            
-            {match.nocUrl && (
-              <a
+    <div className="mx-auto w-full max-w-[820px] px-5 sm:px-8 py-10 sm:py-14 rooted-in">
+      <ScreenHeader title={match.title} onBack={onBack} backLabel={t.backButton}>
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <Eyebrow><bdi>{pathway.province} · NOC {match.nocCode}</bdi></Eyebrow>
+          {match.nocUrl && (
+            <a
               href={match.nocUrl}
               target="_blank"
+              rel="noopener noreferrer"
               referrerPolicy="no-referrer"
-              className="inline-flex items-center gap-1 text-xs font-bold text-[#233e00] hover:text-[#192d00] hover:underline transition mt-1.5"
+              className="inline-flex items-center gap-1.5 min-h-[40px] text-[0.875rem] font-medium text-forest underline underline-offset-4 decoration-sage"
             >
-              <span>View open jobs on Job Bank</span>
-              <ExternalLink className="w-3.5 h-3.5 opacity-85" />
+              <span>{t.viewJobBank}</span>
+              <ExternalLink aria-hidden="true" className="w-3.5 h-3.5" />
             </a>
           )}
-          </div>
         </div>
+      </ScreenHeader>
 
-        <div className="flex items-center gap-2 self-start md:self-center">
-          {/* PDF language selector */}
-          <div className="flex flex-col gap-1 self-start md:self-center">
-            <select
-              value={pdfLanguage}
-              onChange={(e) => setPdfLanguage(e.target.value)}
-              className="text-xs bg-[#F7F5F0] border border-[#E9E5DE] rounded-xl px-3 py-2 text-[#2A2A28] font-semibold cursor-pointer outline-none focus:border-[#233e00]"
-            >
-              <option value="eng_Latn">English</option>
-              <option value="fra_Latn">Slovak</option>
-              <option value="arb_Arab">Arabic</option>
-              <option value="fas_Arab">Persian / Farsi</option>
-              <option value="urd_Arab">Urdu</option>
-              <option value="prs_Arab">Dari</option>
-              <option value="spa_Latn">Spanish</option>
-              <option value="por_Latn">Portuguese</option>
-              <option value="deu_Latn">German</option>
-              <option value="ita_Latn">Italian</option>
-              <option value="tur_Latn">Turkish</option>
-              <option value="ind_Latn">Indonesian</option>
-              <option value="vie_Latn">Vietnamese</option>
-              <option value="pol_Latn">Polish</option>
-              <option value="tgl_Latn">Tagalog</option>
-              <option value="som_Latn">Somali</option>            </select>
-          </div>          <button
-            onClick={handleExportPdf}
-            disabled={isExporting}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#233e00] hover:bg-[#192d00] rounded-xl transition cursor-pointer disabled:opacity-60"
-          >
-            {isExporting ? (
-              <>
-                <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                <span>Generating...</span>
-              </>
-            ) : (
-              <>
-                <Download className="w-3.5 h-3.5" />
-                <span>Download PDF</span>
-              </>
-            )}
-          </button>
-
-        </div>
+      {/* Download */}
+      <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center">
+        <label htmlFor="pdf-language" className="sr-only">{t.pdfLanguage}</label>
+        <select
+          id="pdf-language"
+          value={pdfLanguage}
+          onChange={(e) => setPdfLanguage(e.target.value)}
+          className={`${fieldBase} min-h-[48px] sm:w-auto cursor-pointer`}
+        >
+          <option value="eng_Latn">English</option>
+          <option value="fra_Latn">Français</option>
+          <option value="arb_Arab">العربية</option>
+          <option value="fas_Arab">فارسی</option>
+          <option value="urd_Arab">اردو</option>
+          <option value="prs_Arab">دری</option>
+          <option value="spa_Latn">Español</option>
+          <option value="por_Latn">Português</option>
+          <option value="deu_Latn">Deutsch</option>
+          <option value="ita_Latn">Italiano</option>
+          <option value="tur_Latn">Türkçe</option>
+          <option value="ind_Latn">Bahasa Indonesia</option>
+          <option value="vie_Latn">Tiếng Việt</option>
+          <option value="pol_Latn">Polski</option>
+          <option value="tgl_Latn">Tagalog</option>
+          <option value="som_Latn">Soomaali</option>
+        </select>
+        <button type="button" onClick={handleExportPdf} disabled={isExporting} className={btnForest}>
+          {isExporting ? (
+            <>
+              <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
+              <span>{t.generatingPdf}</span>
+            </>
+          ) : (
+            <>
+              <Download aria-hidden="true" className="w-4 h-4" />
+              <span>{t.downloadPdf}</span>
+            </>
+          )}
+        </button>
       </div>
 
-      {/* Export error notice */}
+      {/* Notices */}
       {exportError && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs font-semibold text-red-700 text-left">
-          ⚠ {exportError}
-        </div>
+        <p role="alert" className="mt-4 mb-0 flex gap-2 items-start rounded-xl bg-cream px-4 py-3 text-[0.875rem] text-forest-deep">
+          <AlertCircle aria-hidden="true" className="w-4 h-4 mt-0.5 shrink-0" />
+          {exportError}
+        </p>
       )}
-
-      {/* Fallback notice */}
       {usingFallback && (
-        <div className="bg-[#FAF4EB] border border-[#F3E2C9]/60 rounded-xl p-3 text-xs font-semibold text-[#865E26] text-left">
-          ⚠ Showing general guidance — could not reach the pathway generator.
-        </div>
+        <p className="mt-4 mb-0 flex gap-2 items-start rounded-xl bg-cream px-4 py-3 text-[0.875rem] text-forest-deep">
+          <AlertCircle aria-hidden="true" className="w-4 h-4 mt-0.5 shrink-0" />
+          {t.fallbackNotice}
+        </p>
       )}
 
-      {/* Side-by-Side Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-        <div className="bg-white border border-[#E9E5DE] rounded-2xl p-5 shadow-sm flex items-start gap-4">
-          <div className="p-3 bg-[#EAF3EE] rounded-xl text-[#3B6651] border border-[#C2DEC3]/40 shrink-0">
-            <Calendar className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-[10px] font-bold text-[#2A2A28] uppercase tracking-widest mb-0.5">{t.estTime}</h4>
-            <p className="text-base font-bold text-[#343432]">{pathway.typicalTime}</p>
-          </div>
+      {/* Time and cost */}
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-start">
+        <div className="flex flex-col gap-1.5 rounded-xl bg-cream px-5 py-4">
+          <Eyebrow>{t.estTime}</Eyebrow>
+          <span dir="auto" className="font-serif text-[1.5rem] leading-[1.2] font-semibold text-forest">{pathway.typicalTime}</span>
         </div>
-
-        <div className="bg-white border border-[#E9E5DE] rounded-2xl p-5 shadow-sm flex items-start gap-4">
-          <div className="p-3 bg-[#FAF4EB] rounded-xl text-[#865E26] border border-[#F3E2C9]/40 shrink-0">
-            <Coins className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-[10px] font-bold text-[#2A2A28] uppercase tracking-widest mb-0.5">{t.estCost}</h4>
-            <p className="text-base font-bold text-[#343432]">{pathway.typicalCost}</p>
-          </div>
+        <div className="flex flex-col gap-1.5 rounded-xl bg-cream px-5 py-4">
+          <Eyebrow>{t.estCost}</Eyebrow>
+          <span dir="auto" className="font-serif text-[1.5rem] leading-[1.2] font-semibold text-forest">{pathway.typicalCost}</span>
         </div>
       </div>
 
-
-      {/* Step by Step Roadmap */}
-      <div className="space-y-6 text-left">
-        <h3 className="text-lg font-bold font-serif text-[#2A2A28] tracking-tight border-b border-[#F1EDEA] pb-2">
-          Your Step-by-Step Licensing Map
-        </h3>
-
-        <div className="relative border-l-2 border-[#E9E5DE] pl-6 ml-4 space-y-8">
-          {pathway.steps.map((step) => {
-            const color = statusColors[step.status] || statusColors.info;
-            return (
-              <div key={step.id} className="relative group p-1">
-                {/* Visual Connector Dot */}
-                <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full border-2 border-white bg-[#A08E79] group-hover:bg-[#233e00] transition shadow-xs flex items-center justify-center">
-                  <span className="w-1.5 h-1.5 bg-white rounded-full" />
-                </div>
-
-                <div className="flex flex-wrap justify-between items-start gap-3 mb-2">
-                  <h4 className="text-base font-bold font-serif text-[#2A2A28] leading-snug">
-                    Step {step.id}: {step.title}
-                  </h4>
-
-                  {/* Status Indicator (Text + Color combo mandatory requirement) */}
-                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider border uppercase flex items-center gap-1.5 ${color.text}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${color.dot}`} />
-                    {step.statusText}
+      {/* Steps */}
+      <section className="mt-12 text-start">
+        <h2 dir="auto" className="m-0 text-[1.75rem] leading-[1.15] font-semibold text-forest">{t.licensingMapTitle}</h2>
+        <ol className="mt-6 list-none p-0 m-0 flex flex-col">
+          {pathway.steps.map((step, i) => (
+            <li key={step.id} className="relative flex gap-4 pb-8">
+              {/* Connector line between numbers */}
+              {i < pathway.steps.length - 1 && (
+                <span aria-hidden="true" className="absolute top-9 bottom-0 start-[15px] w-px bg-line" />
+              )}
+              <span aria-hidden="true" className="relative z-[1] shrink-0 w-[31px] h-[31px] rounded-full bg-forest text-cream font-mono text-[0.8125rem] flex items-center justify-center">
+                {step.id}
+              </span>
+              <div className="flex flex-col gap-2 min-w-0 pt-0.5">
+                <h3 dir="auto" className="m-0 font-sans text-[1.0625rem] leading-[1.35] font-semibold text-forest-deep">
+                  <span className="sr-only">{t.stepWord} {step.id}: </span>{step.title}
+                </h3>
+                {/* The generic "Step" tag repeats the number, so only real tags show. */}
+                {step.statusText !== 'Step' && (
+                  <span className="self-start rounded-md border border-line px-2 py-0.5 text-[0.75rem] font-medium text-sage-dark">
+                    {t[STATUS_TRANSLATION_KEYS[step.statusText]] ?? step.statusText}
                   </span>
-                </div>
-
-                <p className="text-[#2A2A28] text-sm leading-relaxed mb-3 max-w-2xl">
-                  {step.description}
-                </p>
+                )}
+                <p dir="auto" className="m-0 text-[0.9375rem] leading-[1.6] text-forest-deep">{step.description}</p>
                 {step.actionLabel && step.actionUrl && (
-                    <a
+                  <a
                     href={step.actionUrl}
                     target="_blank"
+                    rel="noopener noreferrer"
                     referrerPolicy="no-referrer"
-                    className="inline-flex items-center gap-1 text-xs font-bold text-[#233e00] hover:text-[#192d00] hover:underline transition"
+                    className="self-start inline-flex items-center gap-1.5 min-h-[40px] text-[0.875rem] font-medium text-forest underline underline-offset-4 decoration-sage"
                   >
                     <span>{step.actionLabel}</span>
-                    <ExternalLink className="w-3.5 h-3.5 opacity-85" />
+                    <ExternalLink aria-hidden="true" className="w-3.5 h-3.5" />
                   </a>
                 )}
-
               </div>
-            );
-          })}
-        </div>
-      </div>
+            </li>
+          ))}
+        </ol>
+      </section>
 
-        {/* Financial Support Available */}
-        <div className="bg-[#F1EDEA] border border-[#E9E5DE] rounded-2xl p-6 text-left">
-          <div className="flex items-center gap-2.5 mb-3">
-            <Coins className="w-5 h-5 text-[#233e00]" />
-            <h3 className="text-sm font-bold text-[#2A2A28] uppercase tracking-wider">
-              {t.fundingEarly}
-            </h3>
-          </div>
-          <ul className="space-y-2.5 text-xs md:text-sm text-[#2A2A28] leading-relaxed list-disc list-inside">
-            {pathway.fundingOptions.map((opt, i) => (
-              <li key={i}>{opt}</li>
-            ))}
-          </ul>
-        </div>
-
-      {/* Trans-inclusive guidance mismatches GUIDE (Conditional) */}
-      {(userInput.isTransOrGenderDiverse || pathway.nameDiscrepancyGuide) && (
-        <div className="bg-[#F3EFF9] border border-[#DDD1ED]/40 rounded-2xl p-6 text-left space-y-2.5">
-          <div className="flex items-center gap-2 text-[#5A3886]">
-            <Users className="w-5 h-5 shrink-0" />
-            <h3 className="text-sm font-bold uppercase tracking-wider">{t.transGuidanceTitle}</h3>
-          </div>
-          <p className="text-xs md:text-sm text-[#2A2A28] leading-relaxed">
-            Many trans and non-binary refugees encounter significant name mismatches on educational transcripts from their birth countries.
-            Canadian human rights frameworks guarantee preferred name processing:
-          </p>
-          <p className="text-xs font-semibold text-[#5A3886] bg-white border border-[#DDD1ED]/50 p-3 rounded-xl leading-relaxed">
-            {pathway.nameDiscrepancyGuide || "Submit a direct statutory declaration of transition alongside any settlement letter to have provincial regulators override database deadnames safely without public history disclosure."}
-          </p>
-        </div>
+      {/* Funding (only when the pathway has real funding information) */}
+      {pathway.fundingOptions.length > 0 && (
+      <section className="rounded-2xl bg-cream px-6 py-5 text-start">
+        <Eyebrow>{t.fundingEarly}</Eyebrow>
+        <ul className="mt-3 mb-0 ps-5 flex flex-col gap-2 text-[0.9375rem] leading-[1.6] text-forest-deep list-disc">
+          {pathway.fundingOptions.map((opt, i) => (
+            <li key={i} dir="auto">{opt}</li>
+          ))}
+        </ul>
+      </section>
       )}
 
-
-      {/* Find Support CTA */}
-        <button
-          onClick={onFindSupport}
-          className="w-full py-4 px-6 rounded-2xl bg-[#233e00] text-white font-bold text-sm hover:bg-[#192d00] transition cursor-pointer flex items-center justify-center gap-2"
-        >
-          
-          <span>Find Support Organizations Near You</span>
+      {/* Next */}
+      <div className="mt-10 flex flex-col sm:flex-row gap-3">
+        <button type="button" onClick={onFindSupport} className={`${btnGold} flex-1`}>
+          {t.findSupportCTA}
         </button>
-
-        <button
-          onClick={onReset}
-          className="w-full py-3 px-6 rounded-2xl text-xs font-semibold text-[#7A7A75] bg-[#F7F5F0] hover:bg-[#E9E5DE] border border-[#E9E5DE] hover:border-[#DED9D2] transition cursor-pointer"
-        >
-          Start New Search
+        <button type="button" onClick={onReset} className={btnQuiet}>
+          {t.startNewSearch}
         </button>
+      </div>
     </div>
   );
 }
